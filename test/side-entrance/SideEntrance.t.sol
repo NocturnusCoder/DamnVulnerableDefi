@@ -48,7 +48,6 @@ contract SideEntranceChallenge is Test {
         Attack attack = new Attack(TrusterLenderPool(pool));
         attack.attack();
         attack.withDrawFromPoolandSendtoRecovery();
-
     }
 
     /**
@@ -63,7 +62,7 @@ contract SideEntranceChallenge is Test {
 contract Attack {
     SideEntranceLenderPool pool;
 
-    constructor(SideEntranceLenderPool _pool) {
+	constructor(SideEntranceLenderPool _pool) {
         pool = _pool;
     }
 
