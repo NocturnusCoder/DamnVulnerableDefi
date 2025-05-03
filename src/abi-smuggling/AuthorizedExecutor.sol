@@ -22,7 +22,9 @@ abstract contract AuthorizedExecutor is ReentrancyGuard {
      * @notice Allows first caller to set permissions for a set of action identifiers
      * @param ids array of action identifiers
      */
-    function setPermissions(bytes32[] memory ids) external {
+    function setPermissions(
+        bytes32[] memory ids
+    ) external {
         if (initialized) {
             revert AlreadyInitialized();
         }

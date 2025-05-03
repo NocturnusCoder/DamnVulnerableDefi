@@ -52,7 +52,7 @@ contract CurvyPuppetChallenge is Test {
      */
     function setUp() public {
         // Fork from mainnet state at specific block
-        vm.createSelectFork((vm.envString("MAINNET_FORKING_URL")), 20190356);
+        vm.createSelectFork((vm.envString("MAINNET_FORKING_URL")), 20_190_356);
 
         startHoax(deployer);
 
@@ -65,12 +65,7 @@ contract CurvyPuppetChallenge is Test {
         oracle.setPrice({asset: address(dvt), value: DVT_PRICE, expiration: block.timestamp + 1 days});
 
         // Deploy the lending contract. It will offer LP tokens, accepting DVT as collateral.
-        lending = new CurvyPuppetLending({
-            _collateralAsset: address(dvt),
-            _curvePool: curvePool,
-            _permit2: permit2,
-            _oracle: oracle
-        });
+        lending = new CurvyPuppetLending({_collateralAsset: address(dvt), _curvePool: curvePool, _permit2: permit2, _oracle: oracle});
 
         // Fund treasury account with WETH and approve player's expenses
         deal(address(weth), treasury, TREASURY_WETH_BALANCE);
@@ -99,19 +94,16 @@ contract CurvyPuppetChallenge is Test {
     /**
      * Utility function used during setup of challenge to open users' positions in the lending contract
      */
-    function _openPositionFor(address who) private {
+    function _openPositionFor(
+        address who
+    ) private {
         vm.startPrank(who);
         // Approve and deposit collateral
         address collateralAsset = lending.collateralAsset();
         // Allow permit2 handle token transfers
         IERC20(collateralAsset).approve(address(permit2), type(uint256).max);
         // Allow lending contract to pull collateral
-        permit2.approve({
-            token: lending.collateralAsset(),
-            spender: address(lending),
-            amount: uint160(USER_INITIAL_COLLATERAL_BALANCE),
-            expiration: uint48(block.timestamp)
-        });
+        permit2.approve({token: lending.collateralAsset(), spender: address(lending), amount: uint160(USER_INITIAL_COLLATERAL_BALANCE), expiration: uint48(block.timestamp)});
         // Deposit collateral + borrow
         lending.deposit(USER_INITIAL_COLLATERAL_BALANCE);
         lending.borrow(USER_BORROW_AMOUNT);
@@ -157,9 +149,7 @@ contract CurvyPuppetChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_curvyPuppet() public checkSolvedByPlayer {
-        
-    }
+    function test_curvyPuppet() public checkSolvedByPlayer {}
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

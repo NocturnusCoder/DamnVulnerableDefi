@@ -30,7 +30,9 @@ contract NaiveReceiverPool is Multicall, IERC3156FlashLender {
         _deposit(msg.value);
     }
 
-    function maxFlashLoan(address token) external view returns (uint256) {
+    function maxFlashLoan(
+        address token
+    ) external view returns (uint256) {
         if (token == address(weth)) return weth.balanceOf(address(this));
         return 0;
     }
@@ -40,10 +42,7 @@ contract NaiveReceiverPool is Multicall, IERC3156FlashLender {
         return FIXED_FEE;
     }
 
-    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
-        external
-        returns (bool)
-    {
+    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data) external returns (bool) {
         if (token != address(weth)) revert UnsupportedCurrency();
 
         // Transfer WETH and handle control to receiver
@@ -76,7 +75,9 @@ contract NaiveReceiverPool is Multicall, IERC3156FlashLender {
         _deposit(msg.value);
     }
 
-    function _deposit(uint256 amount) private {
+    function _deposit(
+        uint256 amount
+    ) private {
         weth.deposit{value: amount}();
 
         deposits[_msgSender()] += amount;

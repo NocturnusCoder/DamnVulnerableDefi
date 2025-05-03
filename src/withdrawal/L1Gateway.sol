@@ -26,19 +26,14 @@ contract L1Gateway is OwnableRoles {
         _initializeOwner(msg.sender);
     }
 
-    function setRoot(bytes32 _root) external onlyOwner {
+    function setRoot(
+        bytes32 _root
+    ) external onlyOwner {
         if (_root == bytes32(0) || _root == root) revert BadNewRoot();
         root = _root;
     }
 
-    function finalizeWithdrawal(
-        uint256 nonce,
-        address l2Sender,
-        address target,
-        uint256 timestamp,
-        bytes memory message,
-        bytes32[] memory proof
-    ) external {
+    function finalizeWithdrawal(uint256 nonce, address l2Sender, address target, uint256 timestamp, bytes memory message, bytes32[] memory proof) external {
         if (timestamp + DELAY > block.timestamp) revert EarlyWithdrawal();
 
         bytes32 leaf = keccak256(abi.encode(nonce, l2Sender, target, timestamp, message));

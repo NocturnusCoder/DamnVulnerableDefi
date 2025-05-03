@@ -8,22 +8,9 @@ import {Safe, OwnerManager, Enum} from "@safe-global/safe-smart-account/contract
 import {SafeProxy} from "@safe-global/safe-smart-account/contracts/proxies/SafeProxy.sol";
 import {DamnValuableToken} from "../../src/DamnValuableToken.sol";
 import {WalletDeployer} from "../../src/wallet-mining/WalletDeployer.sol";
-import {
-    AuthorizerFactory, AuthorizerUpgradeable, TransparentProxy
-} from "../../src/wallet-mining/AuthorizerFactory.sol";
-import {
-    ICreateX,
-    CREATEX_DEPLOYMENT_SIGNER,
-    CREATEX_ADDRESS,
-    CREATEX_DEPLOYMENT_TX,
-    CREATEX_CODEHASH
-} from "./CreateX.sol";
-import {
-    SAFE_SINGLETON_FACTORY_DEPLOYMENT_SIGNER,
-    SAFE_SINGLETON_FACTORY_DEPLOYMENT_TX,
-    SAFE_SINGLETON_FACTORY_ADDRESS,
-    SAFE_SINGLETON_FACTORY_CODE
-} from "./SafeSingletonFactory.sol";
+import {AuthorizerFactory, AuthorizerUpgradeable, TransparentProxy} from "../../src/wallet-mining/AuthorizerFactory.sol";
+import {ICreateX, CREATEX_DEPLOYMENT_SIGNER, CREATEX_ADDRESS, CREATEX_DEPLOYMENT_TX, CREATEX_CODEHASH} from "./CreateX.sol";
+import {SAFE_SINGLETON_FACTORY_DEPLOYMENT_SIGNER, SAFE_SINGLETON_FACTORY_DEPLOYMENT_TX, SAFE_SINGLETON_FACTORY_ADDRESS, SAFE_SINGLETON_FACTORY_CODE} from "./SafeSingletonFactory.sol";
 
 contract WalletMiningChallenge is Test {
     address deployer = makeAddr("deployer");
@@ -61,11 +48,7 @@ contract WalletMiningChallenge is Test {
         // Deploy Safe Singleton Factory contract using signed transaction
         vm.deal(SAFE_SINGLETON_FACTORY_DEPLOYMENT_SIGNER, 10 ether);
         vm.broadcastRawTransaction(SAFE_SINGLETON_FACTORY_DEPLOYMENT_TX);
-        assertEq(
-            SAFE_SINGLETON_FACTORY_ADDRESS.codehash,
-            keccak256(SAFE_SINGLETON_FACTORY_CODE),
-            "Unexpected Safe Singleton Factory code"
-        );
+        assertEq(SAFE_SINGLETON_FACTORY_ADDRESS.codehash, keccak256(SAFE_SINGLETON_FACTORY_CODE), "Unexpected Safe Singleton Factory code");
 
         // Deploy CreateX contract using signed transaction
         vm.deal(CREATEX_DEPLOYMENT_SIGNER, 10 ether);
@@ -83,24 +66,18 @@ contract WalletMiningChallenge is Test {
         address[] memory aims = new address[](1);
         aims[0] = USER_DEPOSIT_ADDRESS;
 
-        AuthorizerFactory authorizerFactory = AuthorizerFactory(
-            ICreateX(CREATEX_ADDRESS).deployCreate2({
-                salt: bytes32(keccak256("dvd.walletmining.authorizerfactory")),
-                initCode: type(AuthorizerFactory).creationCode
-            })
-        );
+        AuthorizerFactory authorizerFactory =
+            AuthorizerFactory(ICreateX(CREATEX_ADDRESS).deployCreate2({salt: bytes32(keccak256("dvd.walletmining.authorizerfactory")), initCode: type(AuthorizerFactory).creationCode}));
         authorizer = AuthorizerUpgradeable(authorizerFactory.deployWithProxy(wards, aims, upgrader));
 
         // Send big bag full of DVT tokens to the deposit address
         token.transfer(USER_DEPOSIT_ADDRESS, DEPOSIT_TOKEN_AMOUNT);
 
         // Call singleton factory to deploy copy and factory contracts
-        (bool success, bytes memory returndata) =
-            address(SAFE_SINGLETON_FACTORY_ADDRESS).call(bytes.concat(bytes32(""), type(Safe).creationCode));
+        (bool success, bytes memory returndata) = address(SAFE_SINGLETON_FACTORY_ADDRESS).call(bytes.concat(bytes32(""), type(Safe).creationCode));
         singletonCopy = Safe(payable(address(uint160(bytes20(returndata)))));
 
-        (success, returndata) =
-            address(SAFE_SINGLETON_FACTORY_ADDRESS).call(bytes.concat(bytes32(""), type(SafeProxyFactory).creationCode));
+        (success, returndata) = address(SAFE_SINGLETON_FACTORY_ADDRESS).call(bytes.concat(bytes32(""), type(SafeProxyFactory).creationCode));
         proxyFactory = SafeProxyFactory(address(uint160(bytes20(returndata))));
 
         // Deploy wallet deployer
@@ -156,9 +133,7 @@ contract WalletMiningChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_walletMining() public checkSolvedByPlayer {
-        
-    }
+    function test_walletMining() public checkSolvedByPlayer {}
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

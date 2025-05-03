@@ -34,7 +34,9 @@ contract WalletDeployer {
     /**
      * @notice Allows the chief to set an authorizer contract.
      */
-    function rule(address _mom) external {
+    function rule(
+        address _mom
+    ) external {
         if (msg.sender != chief || _mom == address(0) || mom != address(0)) {
             revert Boom();
         }

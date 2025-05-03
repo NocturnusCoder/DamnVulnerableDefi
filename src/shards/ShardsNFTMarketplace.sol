@@ -37,13 +37,7 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
     mapping(uint256 nftId => uint64 offerId) public nftToOffers;
     mapping(uint64 offerdId => Purchase[]) public purchases;
 
-    constructor(
-        DamnValuableNFT _nft,
-        DamnValuableToken _paymentToken,
-        address _feeVaultImplementation,
-        address _oracle,
-        uint256 _initialRate
-    ) ERC1155("") {
+    constructor(DamnValuableNFT _nft, DamnValuableToken _paymentToken, address _feeVaultImplementation, address _oracle, uint256 _initialRate) ERC1155("") {
         paymentToken = _paymentToken;
         nft = _nft;
         oracle = _oracle;
@@ -67,14 +61,7 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         offerCount++; // offer IDs start at 1
 
         // create and store new offer
-        offers[offerCount] = Offer({
-            nftId: nftId,
-            totalShards: totalShards,
-            stock: totalShards,
-            price: price,
-            seller: msg.sender,
-            isOpen: true
-        });
+        offers[offerCount] = Offer({nftId: nftId, totalShards: totalShards, stock: totalShards, price: price, seller: msg.sender, isOpen: true});
 
         nftToOffers[nftId] = offerCount;
 
@@ -92,7 +79,9 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
      * Caller can redeem and burn all shards to claim the associated NFT
      * @param nftId ID of the NFT to claim
      */
-    function redeem(uint256 nftId) external {
+    function redeem(
+        uint256 nftId
+    ) external {
         if (nft.ownerOf(nftId) != address(this)) revert UnknownNFT(nftId);
         uint64 offerId = nftToOffers[nftId];
         Offer memory offer = offers[offerId];
@@ -104,7 +93,9 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         nft.safeTransferFrom(address(this), msg.sender, nftId, "");
     }
 
-    function depositFees(bool stake) external {
+    function depositFees(
+        bool stake
+    ) external {
         feeVault.deposit(feesInBalance, stake);
         feesInBalance = 0;
     }
@@ -123,18 +114,8 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         offer.stock -= want;
         purchaseIndex = purchases[offerId].length;
         uint256 _currentRate = rate;
-        purchases[offerId].push(
-            Purchase({
-                shards: want,
-                rate: _currentRate,
-                buyer: msg.sender,
-                timestamp: uint64(block.timestamp),
-                cancelled: false
-            })
-        );
-        paymentToken.transferFrom(
-            msg.sender, address(this), want.mulDivDown(_toDVT(offer.price, _currentRate), offer.totalShards)
-        );
+        purchases[offerId].push(Purchase({shards: want, rate: _currentRate, buyer: msg.sender, timestamp: uint64(block.timestamp), cancelled: false}));
+        paymentToken.transferFrom(msg.sender, address(this), want.mulDivDown(_toDVT(offer.price, _currentRate), offer.totalShards));
         if (offer.stock == 0) _closeOffer(offerId);
     }
 
@@ -149,10 +130,7 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         if (msg.sender != buyer) revert NotAllowed();
         if (!offer.isOpen) revert NotOpened(offerId);
         if (purchase.cancelled) revert AlreadyCancelled();
-        if (
-            purchase.timestamp + CANCEL_PERIOD_LENGTH < block.timestamp
-                || block.timestamp > purchase.timestamp + TIME_BEFORE_CANCEL
-        ) revert BadTime();
+        if (purchase.timestamp + CANCEL_PERIOD_LENGTH < block.timestamp || block.timestamp > purchase.timestamp + TIME_BEFORE_CANCEL) revert BadTime();
 
         offer.stock += purchase.shards;
         assert(offer.stock <= offer.totalShards); // invariant
@@ -166,7 +144,9 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
     /**
      * @notice Allows an oracle account to set a new rate of DVT per USDC
      */
-    function setRate(uint256 newRate) external {
+    function setRate(
+        uint256 newRate
+    ) external {
         if (msg.sender != oracle) revert NotAllowed();
         if (newRate == 0 || rate == newRate) revert BadRate();
         rate = newRate;
@@ -181,7 +161,9 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         return _toDVT(fee, _rate);
     }
 
-    function getOffer(uint64 offerId) external view returns (Offer memory) {
+    function getOffer(
+        uint64 offerId
+    ) external view returns (Offer memory) {
         return offers[offerId];
     }
 
@@ -189,7 +171,9 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         return IERC721Receiver.onERC721Received.selector;
     }
 
-    function _chargeFees(uint256 price) private {
+    function _chargeFees(
+        uint256 price
+    ) private {
         uint256 feeAmount = getFee(price, rate);
         feesInBalance += feeAmount;
         emit Fee(feeAmount);
@@ -197,7 +181,9 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         assert(feesInBalance <= paymentToken.balanceOf(address(this))); // invariant
     }
 
-    function _closeOffer(uint64 offerId) private {
+    function _closeOffer(
+        uint64 offerId
+    ) private {
         Offer memory offer = offers[offerId];
         Purchase[] memory _purchases = purchases[offerId];
         uint256 payment;

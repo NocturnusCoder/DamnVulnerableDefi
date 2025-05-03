@@ -43,8 +43,7 @@ contract PuppetChallenge is Test {
         vm.deal(player, PLAYER_INITIAL_ETH_BALANCE);
 
         // Deploy a exchange that will be used as the factory template
-        IUniswapV1Exchange uniswapV1ExchangeTemplate =
-            IUniswapV1Exchange(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV1Exchange.json")));
+        IUniswapV1Exchange uniswapV1ExchangeTemplate = IUniswapV1Exchange(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV1Exchange.json")));
 
         // Deploy factory, initializing it with the address of the template exchange
         uniswapV1Factory = IUniswapV1Factory(deployCode("builds/uniswap/UniswapV1Factory.json"));
@@ -80,10 +79,7 @@ contract PuppetChallenge is Test {
         assertEq(player.balance, PLAYER_INITIAL_ETH_BALANCE);
         assertEq(uniswapV1Exchange.factoryAddress(), address(uniswapV1Factory));
         assertEq(uniswapV1Exchange.tokenAddress(), address(token));
-        assertEq(
-            uniswapV1Exchange.getTokenToEthInputPrice(1e18),
-            _calculateTokenToEthInputPrice(1e18, UNISWAP_INITIAL_TOKEN_RESERVE, UNISWAP_INITIAL_ETH_RESERVE)
-        );
+        assertEq(uniswapV1Exchange.getTokenToEthInputPrice(1e18), _calculateTokenToEthInputPrice(1e18, UNISWAP_INITIAL_TOKEN_RESERVE, UNISWAP_INITIAL_ETH_RESERVE));
         assertEq(lendingPool.calculateDepositRequired(1e18), 2e18);
         assertEq(lendingPool.calculateDepositRequired(POOL_INITIAL_TOKEN_BALANCE), POOL_INITIAL_TOKEN_BALANCE * 2);
     }
@@ -91,16 +87,10 @@ contract PuppetChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_puppet() public checkSolvedByPlayer {
-        
-    }
+    function test_puppet() public checkSolvedByPlayer {}
 
     // Utility function to calculate Uniswap prices
-    function _calculateTokenToEthInputPrice(uint256 tokensSold, uint256 tokensInReserve, uint256 etherInReserve)
-        private
-        pure
-        returns (uint256)
-    {
+    function _calculateTokenToEthInputPrice(uint256 tokensSold, uint256 tokensInReserve, uint256 etherInReserve) private pure returns (uint256) {
         return (tokensSold * 997 * etherInReserve) / (tokensInReserve * 1000 + tokensSold * 997);
     }
 

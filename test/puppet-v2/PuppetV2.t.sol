@@ -47,15 +47,8 @@ contract PuppetV2Challenge is Test {
         weth = new WETH();
 
         // Deploy Uniswap V2 Factory and Router
-        uniswapV2Factory = IUniswapV2Factory(
-            deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Factory.json"), abi.encode(address(0)))
-        );
-        uniswapV2Router = IUniswapV2Router02(
-            deployCode(
-                string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Router02.json"),
-                abi.encode(address(uniswapV2Factory), address(weth))
-            )
-        );
+        uniswapV2Factory = IUniswapV2Factory(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Factory.json"), abi.encode(address(0))));
+        uniswapV2Router = IUniswapV2Router02(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Router02.json"), abi.encode(address(uniswapV2Factory), address(weth))));
 
         // Create Uniswap pair against WETH and add liquidity
         token.approve(address(uniswapV2Router), UNISWAP_INITIAL_TOKEN_RESERVE);
@@ -70,8 +63,7 @@ contract PuppetV2Challenge is Test {
         uniswapV2Exchange = IUniswapV2Pair(uniswapV2Factory.getPair(address(token), address(weth)));
 
         // Deploy the lending pool
-        lendingPool =
-            new PuppetV2Pool(address(weth), address(token), address(uniswapV2Exchange), address(uniswapV2Factory));
+        lendingPool = new PuppetV2Pool(address(weth), address(token), address(uniswapV2Exchange), address(uniswapV2Factory));
 
         // Setup initial token balances of pool and player accounts
         token.transfer(player, PLAYER_INITIAL_TOKEN_BALANCE);
@@ -91,15 +83,13 @@ contract PuppetV2Challenge is Test {
 
         // Check pool's been correctly setup
         assertEq(lendingPool.calculateDepositOfWETHRequired(1 ether), 0.3 ether);
-        assertEq(lendingPool.calculateDepositOfWETHRequired(POOL_INITIAL_TOKEN_BALANCE), 300000 ether);
+        assertEq(lendingPool.calculateDepositOfWETHRequired(POOL_INITIAL_TOKEN_BALANCE), 300_000 ether);
     }
 
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_puppetV2() public checkSolvedByPlayer {
-        
-    }
+    function test_puppetV2() public checkSolvedByPlayer {}
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

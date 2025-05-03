@@ -15,7 +15,9 @@ contract SimpleGovernance is ISimpleGovernance {
     uint256 private _actionCounter;
     mapping(uint256 => GovernanceAction) private _actions;
 
-    constructor(DamnValuableVotes votingToken) {
+    constructor(
+        DamnValuableVotes votingToken
+    ) {
         _votingToken = votingToken;
         _actionCounter = 1;
     }
@@ -35,13 +37,7 @@ contract SimpleGovernance is ISimpleGovernance {
 
         actionId = _actionCounter;
 
-        _actions[actionId] = GovernanceAction({
-            target: target,
-            value: value,
-            proposedAt: uint64(block.timestamp),
-            executedAt: 0,
-            data: data
-        });
+        _actions[actionId] = GovernanceAction({target: target, value: value, proposedAt: uint64(block.timestamp), executedAt: 0, data: data});
 
         unchecked {
             _actionCounter++;
@@ -50,7 +46,9 @@ contract SimpleGovernance is ISimpleGovernance {
         emit ActionQueued(actionId, msg.sender);
     }
 
-    function executeAction(uint256 actionId) external payable returns (bytes memory) {
+    function executeAction(
+        uint256 actionId
+    ) external payable returns (bytes memory) {
         if (!_canBeExecuted(actionId)) {
             revert CannotExecute(actionId);
         }
@@ -71,7 +69,9 @@ contract SimpleGovernance is ISimpleGovernance {
         return address(_votingToken);
     }
 
-    function getAction(uint256 actionId) external view returns (GovernanceAction memory) {
+    function getAction(
+        uint256 actionId
+    ) external view returns (GovernanceAction memory) {
         return _actions[actionId];
     }
 
@@ -84,7 +84,9 @@ contract SimpleGovernance is ISimpleGovernance {
      * 1) it's never been executed before and
      * 2) enough time has passed since it was first proposed
      */
-    function _canBeExecuted(uint256 actionId) private view returns (bool) {
+    function _canBeExecuted(
+        uint256 actionId
+    ) private view returns (bool) {
         GovernanceAction memory actionToExecute = _actions[actionId];
 
         if (actionToExecute.proposedAt == 0) return false;
@@ -97,7 +99,9 @@ contract SimpleGovernance is ISimpleGovernance {
         return actionToExecute.executedAt == 0 && timeDelta >= ACTION_DELAY_IN_SECONDS;
     }
 
-    function _hasEnoughVotes(address who) private view returns (bool) {
+    function _hasEnoughVotes(
+        address who
+    ) private view returns (bool) {
         uint256 balance = _votingToken.getVotes(who);
         uint256 halfTotalSupply = _votingToken.totalSupply() / 2;
         return balance > halfTotalSupply;

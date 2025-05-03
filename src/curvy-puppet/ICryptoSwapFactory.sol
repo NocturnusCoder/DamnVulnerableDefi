@@ -31,8 +31,12 @@ interface ICryptoSwapFactory {
 
     function accept_transfer_ownership() external;
     function admin() external view returns (address);
-    function commit_transfer_ownership(address _addr) external;
-    function deploy_gauge(address _pool) external returns (address);
+    function commit_transfer_ownership(
+        address _addr
+    ) external;
+    function deploy_gauge(
+        address _pool
+    ) external returns (address);
     function deploy_pool(
         string memory _name,
         string memory _symbol,
@@ -53,19 +57,41 @@ interface ICryptoSwapFactory {
     function find_pool_for_coins(address _from, address _to, uint256 i) external view returns (address);
     function future_admin() external view returns (address);
     function gauge_implementation() external view returns (address);
-    function get_balances(address _pool) external view returns (uint256[2] memory);
+    function get_balances(
+        address _pool
+    ) external view returns (uint256[2] memory);
     function get_coin_indices(address _pool, address _from, address _to) external view returns (uint256, uint256);
-    function get_coins(address _pool) external view returns (address[2] memory);
-    function get_decimals(address _pool) external view returns (uint256[2] memory);
-    function get_eth_index(address _pool) external view returns (uint256);
-    function get_gauge(address _pool) external view returns (address);
-    function get_token(address _pool) external view returns (address);
+    function get_coins(
+        address _pool
+    ) external view returns (address[2] memory);
+    function get_decimals(
+        address _pool
+    ) external view returns (uint256[2] memory);
+    function get_eth_index(
+        address _pool
+    ) external view returns (uint256);
+    function get_gauge(
+        address _pool
+    ) external view returns (address);
+    function get_token(
+        address _pool
+    ) external view returns (address);
     function pool_count() external view returns (uint256);
     function pool_implementation() external view returns (address);
-    function pool_list(uint256 arg0) external view returns (address);
-    function set_fee_receiver(address _fee_receiver) external;
-    function set_gauge_implementation(address _gauge_implementation) external;
-    function set_pool_implementation(address _pool_implementation) external;
-    function set_token_implementation(address _token_implementation) external;
+    function pool_list(
+        uint256 arg0
+    ) external view returns (address);
+    function set_fee_receiver(
+        address _fee_receiver
+    ) external;
+    function set_gauge_implementation(
+        address _gauge_implementation
+    ) external;
+    function set_pool_implementation(
+        address _pool_implementation
+    ) external;
+    function set_token_implementation(
+        address _token_implementation
+    ) external;
     function token_implementation() external view returns (address);
 }

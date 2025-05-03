@@ -24,8 +24,7 @@ contract PuppetV3Challenge is Test {
     uint24 constant FEE = 3000;
 
     IUniswapV3Factory uniswapFactory = IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984);
-    INonfungiblePositionManager positionManager =
-        INonfungiblePositionManager(payable(0xC36442b4a4522E871399CD717aBDD847Ab11FE88));
+    INonfungiblePositionManager positionManager = INonfungiblePositionManager(payable(0xC36442b4a4522E871399CD717aBDD847Ab11FE88));
     WETH weth = WETH(payable(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2));
     DamnValuableToken token;
     PuppetV3Pool lendingPool;
@@ -44,7 +43,7 @@ contract PuppetV3Challenge is Test {
      */
     function setUp() public {
         // Fork from mainnet state at specific block
-        vm.createSelectFork((vm.envString("MAINNET_FORKING_URL")), 15450164);
+        vm.createSelectFork((vm.envString("MAINNET_FORKING_URL")), 15_450_164);
 
         startHoax(deployer);
 
@@ -61,12 +60,7 @@ contract PuppetV3Challenge is Test {
         bool isWethFirst = address(weth) < address(token);
         address token0 = isWethFirst ? address(weth) : address(token);
         address token1 = isWethFirst ? address(token) : address(weth);
-        positionManager.createAndInitializePoolIfNecessary({
-            token0: token0,
-            token1: token1,
-            fee: FEE,
-            sqrtPriceX96: _encodePriceSqrt(1, 1)
-        });
+        positionManager.createAndInitializePoolIfNecessary({token0: token0, token1: token1, fee: FEE, sqrtPriceX96: _encodePriceSqrt(1, 1)});
 
         IUniswapV3Pool uniswapPool = IUniswapV3Pool(uniswapFactory.getPool(address(weth), address(token), FEE));
         uniswapPool.increaseObservationCardinalityNext(40);
@@ -118,9 +112,7 @@ contract PuppetV3Challenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_puppetV3() public checkSolvedByPlayer {
-        
-    }
+    function test_puppetV3() public checkSolvedByPlayer {}
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

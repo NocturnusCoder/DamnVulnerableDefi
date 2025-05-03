@@ -27,9 +27,7 @@ contract BasicForwarder is EIP712 {
     error InvalidTarget();
     error InvalidValue();
 
-    bytes32 private constant _REQUEST_TYPEHASH = keccak256(
-        "Request(address from,address target,uint256 value,uint256 gas,uint256 nonce,bytes data,uint256 deadline)"
-    );
+    bytes32 private constant _REQUEST_TYPEHASH = keccak256("Request(address from,address target,uint256 value,uint256 gas,uint256 nonce,bytes data,uint256 deadline)");
 
     mapping(address => uint256) public nonces;
 
@@ -79,19 +77,10 @@ contract BasicForwarder is EIP712 {
         version = "1";
     }
 
-    function getDataHash(Request memory request) public pure returns (bytes32) {
-        return keccak256(
-            abi.encode(
-                _REQUEST_TYPEHASH,
-                request.from,
-                request.target,
-                request.value,
-                request.gas,
-                request.nonce,
-                keccak256(request.data),
-                request.deadline
-            )
-        );
+    function getDataHash(
+        Request memory request
+    ) public pure returns (bytes32) {
+        return keccak256(abi.encode(_REQUEST_TYPEHASH, request.from, request.target, request.value, request.gas, request.nonce, keccak256(request.data), request.deadline));
     }
 
     function domainSeparator() external view returns (bytes32) {

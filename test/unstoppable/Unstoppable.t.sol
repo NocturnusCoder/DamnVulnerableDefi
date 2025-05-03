@@ -70,7 +70,7 @@ contract UnstoppableChallenge is Test {
         assertEq(vault.totalSupply(), TOKENS_IN_VAULT);
         assertEq(vault.maxFlashLoan(address(token)), TOKENS_IN_VAULT);
         assertEq(vault.flashFee(address(token), TOKENS_IN_VAULT - 1), 0);
-        assertEq(vault.flashFee(address(token), TOKENS_IN_VAULT), 50000e18);
+        assertEq(vault.flashFee(address(token), TOKENS_IN_VAULT), 50_000e18);
 
         // Vault is owned by monitor contract
         assertEq(vault.owner(), address(monitorContract));
@@ -91,9 +91,8 @@ contract UnstoppableChallenge is Test {
      * CODE YOUR SOLUTION HERE
      */
     function test_unstoppable() public checkSolvedByPlayer {
-        token.transfer(address(vault), 1e18);        
+        token.transfer(address(vault), 1e18);
     }
-
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

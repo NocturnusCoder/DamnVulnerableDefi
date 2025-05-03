@@ -29,7 +29,9 @@ contract DamnValuableStaking is ERC20 {
         lastUpdate = block.timestamp;
     }
 
-    function _updateReward(address staker) private {
+    function _updateReward(
+        address staker
+    ) private {
         _rewardPerToken = rewardsPerToken();
         lastUpdate = block.timestamp;
         if (staker != address(0)) {
@@ -39,7 +41,9 @@ contract DamnValuableStaking is ERC20 {
         emit RewardUpdated(staker, rewards[staker], stakerRewardPerToken[staker]);
     }
 
-    function stake(uint256 amount) external {
+    function stake(
+        uint256 amount
+    ) external {
         if (amount == 0) revert InvalidAmount();
 
         _updateReward(msg.sender);
@@ -60,7 +64,9 @@ contract DamnValuableStaking is ERC20 {
         return super.transferFrom(sender, recipient, amount);
     }
 
-    function withdraw(uint256 amount) external returns (uint256) {
+    function withdraw(
+        uint256 amount
+    ) external returns (uint256) {
         if (amount == 0) revert InvalidAmount();
 
         _updateReward(msg.sender);
@@ -88,7 +94,9 @@ contract DamnValuableStaking is ERC20 {
         }
     }
 
-    function earned(address staker) public view returns (uint256) {
+    function earned(
+        address staker
+    ) public view returns (uint256) {
         return balanceOf[staker] * (rewardsPerToken() - stakerRewardPerToken[staker]) / 1e18 + rewards[staker];
     }
 }

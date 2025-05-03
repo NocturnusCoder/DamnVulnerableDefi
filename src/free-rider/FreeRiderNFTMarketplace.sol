@@ -26,7 +26,9 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
     error TokenNotOffered(uint256 tokenId);
     error InsufficientPayment();
 
-    constructor(uint256 amount) payable {
+    constructor(
+        uint256 amount
+    ) payable {
         DamnValuableNFT _token = new DamnValuableNFT();
         _token.renounceOwnership();
         for (uint256 i = 0; i < amount;) {
@@ -80,7 +82,9 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
         emit NFTOffered(msg.sender, tokenId, price);
     }
 
-    function buyMany(uint256[] calldata tokenIds) external payable nonReentrant {
+    function buyMany(
+        uint256[] calldata tokenIds
+    ) external payable nonReentrant {
         for (uint256 i = 0; i < tokenIds.length; ++i) {
             unchecked {
                 _buyOne(tokenIds[i]);
@@ -88,7 +92,9 @@ contract FreeRiderNFTMarketplace is ReentrancyGuard {
         }
     }
 
-    function _buyOne(uint256 tokenId) private {
+    function _buyOne(
+        uint256 tokenId
+    ) private {
         uint256 priceToPay = offers[tokenId];
         if (priceToPay == 0) {
             revert TokenNotOffered(tokenId);

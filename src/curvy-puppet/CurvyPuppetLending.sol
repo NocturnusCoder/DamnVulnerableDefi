@@ -40,12 +40,16 @@ contract CurvyPuppetLending is ReentrancyGuard {
         oracle = _oracle;
     }
 
-    function deposit(uint256 amount) external nonReentrant {
+    function deposit(
+        uint256 amount
+    ) external nonReentrant {
         positions[msg.sender].collateralAmount += amount;
         _pullAssets(collateralAsset, amount);
     }
 
-    function withdraw(uint256 amount) external nonReentrant {
+    function withdraw(
+        uint256 amount
+    ) external nonReentrant {
         if (amount == 0) revert InvalidAmount();
 
         uint256 remainingCollateral = positions[msg.sender].collateralAmount - amount;
@@ -58,7 +62,9 @@ contract CurvyPuppetLending is ReentrancyGuard {
         IERC20(collateralAsset).transfer(msg.sender, amount);
     }
 
-    function borrow(uint256 amount) external {
+    function borrow(
+        uint256 amount
+    ) external {
         // Get current collateral and borrow values
         uint256 collateralValue = getCollateralValue(positions[msg.sender].collateralAmount);
         uint256 currentBorrowValue = getBorrowValue(positions[msg.sender].borrowAmount);
@@ -82,7 +88,9 @@ contract CurvyPuppetLending is ReentrancyGuard {
         IERC20(borrowAsset).transfer(msg.sender, amount);
     }
 
-    function redeem(uint256 amount) external nonReentrant {
+    function redeem(
+        uint256 amount
+    ) external nonReentrant {
         if (amount == 0) revert InvalidAmount();
         positions[msg.sender].borrowAmount -= amount;
         _pullAssets(borrowAsset, amount);
@@ -94,7 +102,9 @@ contract CurvyPuppetLending is ReentrancyGuard {
         }
     }
 
-    function liquidate(address target) external nonReentrant {
+    function liquidate(
+        address target
+    ) external nonReentrant {
         uint256 borrowAmount = positions[target].borrowAmount;
         uint256 collateralAmount = positions[target].collateralAmount;
 
@@ -108,21 +118,29 @@ contract CurvyPuppetLending is ReentrancyGuard {
         IERC20(collateralAsset).transfer(msg.sender, collateralAmount);
     }
 
-    function getBorrowValue(uint256 amount) public view returns (uint256) {
+    function getBorrowValue(
+        uint256 amount
+    ) public view returns (uint256) {
         if (amount == 0) return 0;
         return amount.mulWadUp(_getLPTokenPrice());
     }
 
-    function getCollateralValue(uint256 amount) public view returns (uint256) {
+    function getCollateralValue(
+        uint256 amount
+    ) public view returns (uint256) {
         if (amount == 0) return 0;
         return amount.mulWadDown(oracle.getPrice(collateralAsset).value);
     }
 
-    function getBorrowAmount(address who) external view returns (uint256) {
+    function getBorrowAmount(
+        address who
+    ) external view returns (uint256) {
         return positions[who].borrowAmount;
     }
 
-    function getCollateralAmount(address who) external view returns (uint256) {
+    function getCollateralAmount(
+        address who
+    ) external view returns (uint256) {
         return positions[who].collateralAmount;
     }
 

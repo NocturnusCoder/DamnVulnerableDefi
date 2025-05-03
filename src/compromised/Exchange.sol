@@ -21,7 +21,9 @@ contract Exchange is ReentrancyGuard {
     event TokenBought(address indexed buyer, uint256 tokenId, uint256 price);
     event TokenSold(address indexed seller, uint256 tokenId, uint256 price);
 
-    constructor(address _oracle) payable {
+    constructor(
+        address _oracle
+    ) payable {
         token = new DamnValuableNFT();
         token.renounceOwnership();
         oracle = TrustfulOracle(_oracle);
@@ -46,7 +48,9 @@ contract Exchange is ReentrancyGuard {
         emit TokenBought(msg.sender, id, price);
     }
 
-    function sellOne(uint256 id) external nonReentrant {
+    function sellOne(
+        uint256 id
+    ) external nonReentrant {
         if (msg.sender != token.ownerOf(id)) {
             revert SellerNotOwner(id);
         }

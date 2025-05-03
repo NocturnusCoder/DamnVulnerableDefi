@@ -33,7 +33,9 @@ contract SelfiePool is IERC3156FlashLender, ReentrancyGuard {
         governance = _governance;
     }
 
-    function maxFlashLoan(address _token) external view returns (uint256) {
+    function maxFlashLoan(
+        address _token
+    ) external view returns (uint256) {
         if (address(token) == _token) {
             return token.balanceOf(address(this));
         }
@@ -47,11 +49,7 @@ contract SelfiePool is IERC3156FlashLender, ReentrancyGuard {
         return 0;
     }
 
-    function flashLoan(IERC3156FlashBorrower _receiver, address _token, uint256 _amount, bytes calldata _data)
-        external
-        nonReentrant
-        returns (bool)
-    {
+    function flashLoan(IERC3156FlashBorrower _receiver, address _token, uint256 _amount, bytes calldata _data) external nonReentrant returns (bool) {
         if (_token != address(token)) {
             revert UnsupportedCurrency();
         }
@@ -68,7 +66,9 @@ contract SelfiePool is IERC3156FlashLender, ReentrancyGuard {
         return true;
     }
 
-    function emergencyExit(address receiver) external onlyGovernance {
+    function emergencyExit(
+        address receiver
+    ) external onlyGovernance {
         uint256 amount = token.balanceOf(address(this));
         token.transfer(receiver, amount);
 

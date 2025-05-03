@@ -59,7 +59,9 @@ contract ClimberVault is Initializable, OwnableUpgradeable, UUPSUpgradeable {
     }
 
     // Allows trusted sweeper account to retrieve any tokens
-    function sweepFunds(address token) external onlySweeper {
+    function sweepFunds(
+        address token
+    ) external onlySweeper {
         SafeTransferLib.safeTransfer(token, _sweeper, IERC20(token).balanceOf(address(this)));
     }
 
@@ -67,7 +69,9 @@ contract ClimberVault is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         return _sweeper;
     }
 
-    function _setSweeper(address newSweeper) private {
+    function _setSweeper(
+        address newSweeper
+    ) private {
         _sweeper = newSweeper;
     }
 
@@ -75,10 +79,14 @@ contract ClimberVault is Initializable, OwnableUpgradeable, UUPSUpgradeable {
         return _lastWithdrawalTimestamp;
     }
 
-    function _updateLastWithdrawalTimestamp(uint256 timestamp) private {
+    function _updateLastWithdrawalTimestamp(
+        uint256 timestamp
+    ) private {
         _lastWithdrawalTimestamp = timestamp;
     }
 
     // By marking this internal function with `onlyOwner`, we only allow the owner account to authorize an upgrade
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 }

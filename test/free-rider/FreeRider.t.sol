@@ -26,7 +26,7 @@ contract FreeRiderChallenge is Test {
     uint256 constant BOUNTY = 45 ether;
 
     // Initial reserves for the Uniswap V2 pool
-    uint256 constant UNISWAP_INITIAL_TOKEN_RESERVE = 15000e18;
+    uint256 constant UNISWAP_INITIAL_TOKEN_RESERVE = 15_000e18;
     uint256 constant UNISWAP_INITIAL_WETH_RESERVE = 9000e18;
 
     WETH weth;
@@ -59,9 +59,7 @@ contract FreeRiderChallenge is Test {
 
         // Deploy Uniswap V2 Factory and Router
         uniswapV2Factory = IUniswapV2Factory(deployCode("builds/uniswap/UniswapV2Factory.json", abi.encode(address(0))));
-        uniswapV2Router = IUniswapV2Router02(
-            deployCode("builds/uniswap/UniswapV2Router02.json", abi.encode(address(uniswapV2Factory), address(weth)))
-        );
+        uniswapV2Router = IUniswapV2Router02(deployCode("builds/uniswap/UniswapV2Router02.json", abi.encode(address(uniswapV2Factory), address(weth))));
 
         token.approve(address(uniswapV2Router), UNISWAP_INITIAL_TOKEN_RESERVE);
         uniswapV2Router.addLiquidityETH{value: UNISWAP_INITIAL_WETH_RESERVE}(
@@ -94,8 +92,7 @@ contract FreeRiderChallenge is Test {
         marketplace.offerMany(ids, prices);
 
         // Deploy recovery manager contract, adding the player as the beneficiary
-        recoveryManager =
-            new FreeRiderRecoveryManager{value: BOUNTY}(player, address(nft), recoveryManagerOwner, BOUNTY);
+        recoveryManager = new FreeRiderRecoveryManager{value: BOUNTY}(player, address(nft), recoveryManagerOwner, BOUNTY);
 
         vm.stopPrank();
     }
@@ -122,9 +119,7 @@ contract FreeRiderChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_freeRider() public checkSolvedByPlayer {
-        
-    }
+    function test_freeRider() public checkSolvedByPlayer {}
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

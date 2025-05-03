@@ -7,7 +7,9 @@ import {UniswapV2Library} from "./UniswapV2Library.sol";
 interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
     function transferFrom(address from, address to, uint256 amount) external returns (bool);
-    function balanceOf(address account) external returns (uint256);
+    function balanceOf(
+        address account
+    ) external returns (uint256);
 }
 
 contract PuppetV2Pool {
@@ -32,7 +34,9 @@ contract PuppetV2Pool {
      *         Sender must have approved enough WETH in advance.
      *         Calculations assume that WETH and borrowed token have same amount of decimals.
      */
-    function borrow(uint256 borrowAmount) external {
+    function borrow(
+        uint256 borrowAmount
+    ) external {
         // Calculate how much WETH the user must deposit
         uint256 amount = calculateDepositOfWETHRequired(borrowAmount);
 
@@ -47,15 +51,18 @@ contract PuppetV2Pool {
         emit Borrowed(msg.sender, amount, borrowAmount, block.timestamp);
     }
 
-    function calculateDepositOfWETHRequired(uint256 tokenAmount) public view returns (uint256) {
+    function calculateDepositOfWETHRequired(
+        uint256 tokenAmount
+    ) public view returns (uint256) {
         uint256 depositFactor = 3;
         return _getOracleQuote(tokenAmount) * depositFactor / 1 ether;
     }
 
     // Fetch the price from Uniswap v2 using the official libraries
-    function _getOracleQuote(uint256 amount) private view returns (uint256) {
-        (uint256 reservesWETH, uint256 reservesToken) =
-            UniswapV2Library.getReserves({factory: _uniswapFactory, tokenA: address(_weth), tokenB: address(_token)});
+    function _getOracleQuote(
+        uint256 amount
+    ) private view returns (uint256) {
+        (uint256 reservesWETH, uint256 reservesToken) = UniswapV2Library.getReserves({factory: _uniswapFactory, tokenA: address(_weth), tokenB: address(_token)});
 
         return UniswapV2Library.quote({amountA: amount * 10 ** 18, reserveA: reservesToken, reserveB: reservesWETH});
     }

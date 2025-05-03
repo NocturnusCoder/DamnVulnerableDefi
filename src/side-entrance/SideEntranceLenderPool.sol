@@ -32,7 +32,9 @@ contract SideEntranceLenderPool {
         SafeTransferLib.safeTransferETH(msg.sender, amount);
     }
 
-    function flashLoan(uint256 amount) external {
+    function flashLoan(
+        uint256 amount
+    ) external {
         uint256 balanceBefore = address(this).balance;
 
         IFlashLoanEtherReceiver(msg.sender).execute{value: amount}();

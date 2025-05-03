@@ -7,7 +7,7 @@ import {L2MessageStore} from "./L2MessageStore.sol";
 
 /**
  * @notice This contract is not deployed in the challenge.
- *         We just include it for you to understand how the withdrawal logs were created. 
+ *         We just include it for you to understand how the withdrawal logs were created.
  */
 contract L2Handler {
     L2MessageStore public immutable l2MessageStore;
@@ -20,10 +20,7 @@ contract L2Handler {
     }
 
     function sendMessage(address target, bytes calldata message) external {
-        l2MessageStore.store({
-            target: address(l1Forwarder),
-            data: abi.encodeCall(L1Forwarder.forwardMessage, (nonce, msg.sender, target, message))
-        });
+        l2MessageStore.store({target: address(l1Forwarder), data: abi.encodeCall(L1Forwarder.forwardMessage, (nonce, msg.sender, target, message))});
 
         unchecked {
             nonce++;

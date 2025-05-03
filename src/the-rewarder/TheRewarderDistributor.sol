@@ -40,11 +40,15 @@ contract TheRewarderDistributor {
 
     event NewDistribution(IERC20 token, uint256 batchNumber, bytes32 newMerkleRoot, uint256 totalAmount);
 
-    function getRemaining(address token) external view returns (uint256) {
+    function getRemaining(
+        address token
+    ) external view returns (uint256) {
         return distributions[IERC20(token)].remaining;
     }
 
-    function getNextBatchNumber(address token) external view returns (uint256) {
+    function getNextBatchNumber(
+        address token
+    ) external view returns (uint256) {
         return distributions[IERC20(token)].nextBatchNumber;
     }
 
@@ -68,7 +72,9 @@ contract TheRewarderDistributor {
         emit NewDistribution(token, batchNumber, newRoot, amount);
     }
 
-    function clean(IERC20[] calldata tokens) external {
+    function clean(
+        IERC20[] calldata tokens
+    ) external {
         for (uint256 i = 0; i < tokens.length; i++) {
             IERC20 token = tokens[i];
             if (distributions[token].remaining == 0) {

@@ -8,14 +8,13 @@ import {WETH, NaiveReceiverPool} from "./NaiveReceiverPool.sol";
 contract FlashLoanReceiver is IERC3156FlashBorrower {
     address private pool;
 
-    constructor(address _pool) {
+    constructor(
+        address _pool
+    ) {
         pool = _pool;
     }
 
-    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata)
-        external
-        returns (bytes32)
-    {
+    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata) external returns (bytes32) {
         assembly {
             // gas savings
             if iszero(eq(sload(pool.slot), caller())) {

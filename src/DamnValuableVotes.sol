@@ -8,7 +8,9 @@ import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Vo
 import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
 
 contract DamnValuableVotes is ERC20, ERC20Permit, ERC20Votes {
-    constructor(uint256 supply) ERC20("DamnValuableVotes", "DVV") ERC20Permit("DamnValuableVotes") {
+    constructor(
+        uint256 supply
+    ) ERC20("DamnValuableVotes", "DVV") ERC20Permit("DamnValuableVotes") {
         _mint(msg.sender, supply);
     }
 
@@ -16,7 +18,9 @@ contract DamnValuableVotes is ERC20, ERC20Permit, ERC20Votes {
         super._update(from, to, amount);
     }
 
-    function nonces(address owner) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
+    function nonces(
+        address owner
+    ) public view virtual override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
     }
 }

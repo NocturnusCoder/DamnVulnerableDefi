@@ -30,7 +30,7 @@ contract UnstoppableChallenge is Script, Test {
     }
 
     /**
-    forge script src/unstoppable/Unstoppable.s.sol --rpc-url http://localhost:8545  -vvvv --broadcast
+     * forge script src/unstoppable/Unstoppable.s.sol --rpc-url http://localhost:8545  -vvvv --broadcast
      */
     function run() public {
         vm.startBroadcast(deployerPK);
@@ -57,7 +57,7 @@ contract UnstoppableChallenge is Script, Test {
 
         vm.startBroadcast(userPK);
         // this line is to solve the challange
-        token.transfer(address(vault), 1e18);        
+        token.transfer(address(vault), 1e18);
         vm.stopBroadcast();
 
         //isSolved checks:
@@ -68,7 +68,6 @@ contract UnstoppableChallenge is Script, Test {
         // And now the monitor paused the vault and transferred ownership to deployer
         assertTrue(vault.paused(), "Vault is not paused");
         assertEq(vault.owner(), deployer, "Vault did not change owner");
-
     }
 
     /**
@@ -88,7 +87,7 @@ contract UnstoppableChallenge is Script, Test {
         assertEq(vault.totalSupply(), TOKENS_IN_VAULT);
         assertEq(vault.maxFlashLoan(address(token)), TOKENS_IN_VAULT);
         assertEq(vault.flashFee(address(token), TOKENS_IN_VAULT - 1), 0);
-        assertEq(vault.flashFee(address(token), TOKENS_IN_VAULT), 50000e18);
+        assertEq(vault.flashFee(address(token), TOKENS_IN_VAULT), 50_000e18);
 
         // Vault is owned by monitor contract
         assertEq(vault.owner(), address(monitorContract));
@@ -104,8 +103,6 @@ contract UnstoppableChallenge is Script, Test {
         vm.expectRevert("UNAUTHORIZED");
         monitorContract.checkFlashLoan(100e18);
     }
-
-
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

@@ -16,12 +16,16 @@ contract TransparentProxy is ERC1967Proxy {
         ERC1967Utils.changeAdmin(msg.sender);
     }
 
-    function setUpgrader(address who) external {
+    function setUpgrader(
+        address who
+    ) external {
         require(msg.sender == ERC1967Utils.getAdmin(), "!admin");
         upgrader = who;
     }
 
-    function isUpgrader(address who) public view returns (bool) {
+    function isUpgrader(
+        address who
+    ) public view returns (bool) {
         return who == upgrader;
     }
 

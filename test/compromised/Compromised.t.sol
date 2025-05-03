@@ -20,12 +20,7 @@ contract CompromisedChallenge is Test {
     uint256 constant PLAYER_INITIAL_ETH_BALANCE = 0.1 ether;
     uint256 constant TRUSTED_SOURCE_INITIAL_ETH_BALANCE = 2 ether;
 
-
-    address[] sources = [
-        0x188Ea627E3531Db590e6f1D71ED83628d1933088,
-        0xA417D473c40a4d42BAd35f147c21eEa7973539D8,
-        0xab3600bF153A316dE44827e2473056d56B774a40
-    ];
+    address[] sources = [0x188Ea627E3531Db590e6f1D71ED83628d1933088, 0xA417D473c40a4d42BAd35f147c21eEa7973539D8, 0xab3600bF153A316dE44827e2473056d56B774a40];
     string[] symbols = ["DVNFT", "DVNFT", "DVNFT"];
     uint256[] prices = [INITIAL_NFT_PRICE, INITIAL_NFT_PRICE, INITIAL_NFT_PRICE];
 
@@ -74,9 +69,7 @@ contract CompromisedChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_compromised() public checkSolved {
-        
-    }
+    function test_compromised() public checkSolved {}
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH

@@ -37,12 +37,7 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
     error OwnerIsNotABeneficiary();
     error InvalidFallbackManager(address fallbackManager);
 
-    constructor(
-        address singletonCopyAddress,
-        address walletFactoryAddress,
-        address tokenAddress,
-        address[] memory initialBeneficiaries
-    ) {
+    constructor(address singletonCopyAddress, address walletFactoryAddress, address tokenAddress, address[] memory initialBeneficiaries) {
         _initializeOwner(msg.sender);
 
         singletonCopy = singletonCopyAddress;
@@ -56,7 +51,9 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
         }
     }
 
-    function addBeneficiary(address beneficiary) external onlyOwner {
+    function addBeneficiary(
+        address beneficiary
+    ) external onlyOwner {
         beneficiaries[beneficiary] = true;
     }
 
@@ -121,9 +118,9 @@ contract WalletRegistry is IProxyCreationCallback, Ownable {
         SafeTransferLib.safeTransfer(address(token), walletAddress, PAYMENT_AMOUNT);
     }
 
-    function _getFallbackManager(address payable wallet) private view returns (address) {
-        return abi.decode(
-            Safe(wallet).getStorageAt(uint256(keccak256("fallback_manager.handler.address")), 0x20), (address)
-        );
+    function _getFallbackManager(
+        address payable wallet
+    ) private view returns (address) {
+        return abi.decode(Safe(wallet).getStorageAt(uint256(keccak256("fallback_manager.handler.address")), 0x20), (address));
     }
 }

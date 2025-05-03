@@ -32,12 +32,7 @@ contract FreeRiderRecoveryManager is ReentrancyGuard, IERC721Receiver {
     }
 
     // Read https://eips.ethereum.org/EIPS/eip-721 for more info on this function
-    function onERC721Received(address, address, uint256 _tokenId, bytes memory _data)
-        external
-        override
-        nonReentrant
-        returns (bytes4)
-    {
+    function onERC721Received(address, address, uint256 _tokenId, bytes memory _data) external override nonReentrant returns (bytes4) {
         if (msg.sender != address(nft)) {
             revert CallerNotNFT();
         }

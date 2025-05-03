@@ -19,8 +19,8 @@ contract TheRewarderChallenge is Test {
     uint256 constant TOTAL_WETH_DISTRIBUTION_AMOUNT = 1 ether;
 
     // Alice is the address at index 2 in the distribution files
-    uint256 constant ALICE_DVT_CLAIM_AMOUNT = 2502024387994809;
-    uint256 constant ALICE_WETH_CLAIM_AMOUNT = 228382988128225;
+    uint256 constant ALICE_DVT_CLAIM_AMOUNT = 2_502_024_387_994_809;
+    uint256 constant ALICE_WETH_CLAIM_AMOUNT = 228_382_988_128_225;
 
     TheRewarderDistributor distributor;
 
@@ -65,19 +65,11 @@ contract TheRewarderChallenge is Test {
 
         // Create DVT distribution
         dvt.approve(address(distributor), TOTAL_DVT_DISTRIBUTION_AMOUNT);
-        distributor.createDistribution({
-            token: IERC20(address(dvt)),
-            newRoot: dvtRoot,
-            amount: TOTAL_DVT_DISTRIBUTION_AMOUNT
-        });
+        distributor.createDistribution({token: IERC20(address(dvt)), newRoot: dvtRoot, amount: TOTAL_DVT_DISTRIBUTION_AMOUNT});
 
         // Create WETH distribution
         weth.approve(address(distributor), TOTAL_WETH_DISTRIBUTION_AMOUNT);
-        distributor.createDistribution({
-            token: IERC20(address(weth)),
-            newRoot: wethRoot,
-            amount: TOTAL_WETH_DISTRIBUTION_AMOUNT
-        });
+        distributor.createDistribution({token: IERC20(address(weth)), newRoot: wethRoot, amount: TOTAL_WETH_DISTRIBUTION_AMOUNT});
 
         // Let's claim rewards for Alice.
 
@@ -147,9 +139,7 @@ contract TheRewarderChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_theRewarder() public checkSolvedByPlayer {
-        
-    }
+    function test_theRewarder() public checkSolvedByPlayer {}
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
@@ -160,16 +150,8 @@ contract TheRewarderChallenge is Test {
         assertLt(weth.balanceOf(address(distributor)), 1e15, "Too much WETH in distributor");
 
         // All funds sent to the designated recovery account
-        assertEq(
-            dvt.balanceOf(recovery),
-            TOTAL_DVT_DISTRIBUTION_AMOUNT - ALICE_DVT_CLAIM_AMOUNT - dvt.balanceOf(address(distributor)),
-            "Not enough DVT in recovery account"
-        );
-        assertEq(
-            weth.balanceOf(recovery),
-            TOTAL_WETH_DISTRIBUTION_AMOUNT - ALICE_WETH_CLAIM_AMOUNT - weth.balanceOf(address(distributor)),
-            "Not enough WETH in recovery account"
-        );
+        assertEq(dvt.balanceOf(recovery), TOTAL_DVT_DISTRIBUTION_AMOUNT - ALICE_DVT_CLAIM_AMOUNT - dvt.balanceOf(address(distributor)), "Not enough DVT in recovery account");
+        assertEq(weth.balanceOf(recovery), TOTAL_WETH_DISTRIBUTION_AMOUNT - ALICE_WETH_CLAIM_AMOUNT - weth.balanceOf(address(distributor)), "Not enough WETH in recovery account");
     }
 
     struct Reward {
@@ -178,9 +160,10 @@ contract TheRewarderChallenge is Test {
     }
 
     // Utility function to read rewards file and load it into an array of leaves
-    function _loadRewards(string memory path) private view returns (bytes32[] memory leaves) {
-        Reward[] memory rewards =
-            abi.decode(vm.parseJson(vm.readFile(string.concat(vm.projectRoot(), path))), (Reward[]));
+    function _loadRewards(
+        string memory path
+    ) private view returns (bytes32[] memory leaves) {
+        Reward[] memory rewards = abi.decode(vm.parseJson(vm.readFile(string.concat(vm.projectRoot(), path))), (Reward[]));
         assertEq(rewards.length, BENEFICIARIES_AMOUNT);
 
         leaves = new bytes32[](BENEFICIARIES_AMOUNT);

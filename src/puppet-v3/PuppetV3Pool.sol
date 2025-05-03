@@ -35,7 +35,9 @@ contract PuppetV3Pool {
      *         Calculations assume that WETH and the borrowed token have the same number of decimals.
      * @param borrowAmount amount of tokens the user intends to borrow
      */
-    function borrow(uint256 borrowAmount) external {
+    function borrow(
+        uint256 borrowAmount
+    ) external {
         // Calculate how much WETH the user must deposit
         uint256 depositOfWETHRequired = calculateDepositOfWETHRequired(borrowAmount);
 
@@ -53,22 +55,23 @@ contract PuppetV3Pool {
         emit Borrowed(msg.sender, depositOfWETHRequired, borrowAmount);
     }
 
-    function calculateDepositOfWETHRequired(uint256 amount) public view returns (uint256) {
+    function calculateDepositOfWETHRequired(
+        uint256 amount
+    ) public view returns (uint256) {
         uint256 quote = _getOracleQuote(_toUint128(amount));
         return quote * DEPOSIT_FACTOR;
     }
 
-    function _getOracleQuote(uint128 amount) private view returns (uint256) {
+    function _getOracleQuote(
+        uint128 amount
+    ) private view returns (uint256) {
         (int24 arithmeticMeanTick,) = OracleLibrary.consult({pool: address(uniswapV3Pool), secondsAgo: TWAP_PERIOD});
-        return OracleLibrary.getQuoteAtTick({
-            tick: arithmeticMeanTick,
-            baseAmount: amount,
-            baseToken: address(token),
-            quoteToken: address(weth)
-        });
+        return OracleLibrary.getQuoteAtTick({tick: arithmeticMeanTick, baseAmount: amount, baseToken: address(token), quoteToken: address(weth)});
     }
 
-    function _toUint128(uint256 amount) private pure returns (uint128 n) {
+    function _toUint128(
+        uint256 amount
+    ) private pure returns (uint128 n) {
         require(amount == (n = uint128(amount)));
     }
 }

@@ -21,7 +21,9 @@ contract CurvyPuppetOracle is Ownable {
         _initializeOwner(msg.sender);
     }
 
-    function getPrice(address asset) external view returns (Price memory) {
+    function getPrice(
+        address asset
+    ) external view returns (Price memory) {
         Price memory price = prices[asset];
 
         if (price.value == 0) revert UnsupportedAsset();

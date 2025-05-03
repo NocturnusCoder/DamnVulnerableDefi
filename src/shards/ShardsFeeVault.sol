@@ -43,7 +43,9 @@ contract ShardsFeeVault is Initializable, Ownable {
         token.transfer(receiver, unstakedAmount + rewards + stakedAmount);
     }
 
-    function enableStaking(DamnValuableStaking _staking) external onlyOwner {
+    function enableStaking(
+        DamnValuableStaking _staking
+    ) external onlyOwner {
         staking = _staking;
         require(staking.token() == token);
         token.approve(address(_staking), type(uint256).max);
