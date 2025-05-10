@@ -56,7 +56,7 @@ contract SideEntranceChallenge is Test {
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
      */
     function _isSolved() private view {
-        assertEq(address(pool).balance, 0, "Pool still has ETH");
+        assertEq(address(pool).balance, 0, "Pool still has ETH"); 
         assertEq(recovery.balance, ETHER_IN_POOL, "Not enough ETH in recovery account");
     }
 }
