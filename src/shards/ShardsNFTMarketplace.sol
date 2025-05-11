@@ -37,7 +37,13 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
     mapping(uint256 nftId => uint64 offerId) public nftToOffers;
     mapping(uint64 offerdId => Purchase[]) public purchases;
 
-    constructor(DamnValuableNFT _nft, DamnValuableToken _paymentToken, address _feeVaultImplementation, address _oracle, uint256 _initialRate) ERC1155("") {
+    constructor(
+        DamnValuableNFT _nft,
+        DamnValuableToken _paymentToken,
+        address _feeVaultImplementation,
+        address _oracle,
+        uint256 _initialRate
+    ) ERC1155("") {
         paymentToken = _paymentToken;
         nft = _nft;
         oracle = _oracle;
@@ -61,7 +67,14 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         offerCount++; // offer IDs start at 1
 
         // create and store new offer
-        offers[offerCount] = Offer({nftId: nftId, totalShards: totalShards, stock: totalShards, price: price, seller: msg.sender, isOpen: true});
+        offers[offerCount] = Offer({
+            nftId: nftId,
+            totalShards: totalShards,
+            stock: totalShards,
+            price: price,
+            seller: msg.sender,
+            isOpen: true
+        });
 
         nftToOffers[nftId] = offerCount;
 
@@ -114,8 +127,18 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         offer.stock -= want;
         purchaseIndex = purchases[offerId].length;
         uint256 _currentRate = rate;
-        purchases[offerId].push(Purchase({shards: want, rate: _currentRate, buyer: msg.sender, timestamp: uint64(block.timestamp), cancelled: false}));
-        paymentToken.transferFrom(msg.sender, address(this), want.mulDivDown(_toDVT(offer.price, _currentRate), offer.totalShards));
+        purchases[offerId].push(
+            Purchase({
+                shards: want,
+                rate: _currentRate,
+                buyer: msg.sender,
+                timestamp: uint64(block.timestamp),
+                cancelled: false
+            })
+        );
+        paymentToken.transferFrom(
+            msg.sender, address(this), want.mulDivDown(_toDVT(offer.price, _currentRate), offer.totalShards)
+        );
         if (offer.stock == 0) _closeOffer(offerId);
     }
 
@@ -130,7 +153,12 @@ contract ShardsNFTMarketplace is IShardsNFTMarketplace, IERC721Receiver, ERC1155
         if (msg.sender != buyer) revert NotAllowed();
         if (!offer.isOpen) revert NotOpened(offerId);
         if (purchase.cancelled) revert AlreadyCancelled();
-        if (purchase.timestamp + CANCEL_PERIOD_LENGTH < block.timestamp || block.timestamp > purchase.timestamp + TIME_BEFORE_CANCEL) revert BadTime();
+        if (
+            purchase.timestamp + CANCEL_PERIOD_LENGTH < block.timestamp
+                || block.timestamp > purchase.timestamp + TIME_BEFORE_CANCEL
+        ) {
+            revert BadTime();
+        }
 
         offer.stock += purchase.shards;
         assert(offer.stock <= offer.totalShards); // invariant

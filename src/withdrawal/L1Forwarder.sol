@@ -38,8 +38,15 @@ contract L1Forwarder is ReentrancyGuard, Ownable {
         l2Handler = _l2Handler;
     }
 
-    function forwardMessage(uint256 nonce, address l2Sender, address target, bytes memory message) external payable nonReentrant {
-        bytes32 messageId = keccak256(abi.encodeWithSignature("forwardMessage(uint256,address,address,bytes)", nonce, l2Sender, target, message));
+    function forwardMessage(
+        uint256 nonce,
+        address l2Sender,
+        address target,
+        bytes memory message
+    ) external payable nonReentrant {
+        bytes32 messageId = keccak256(
+            abi.encodeWithSignature("forwardMessage(uint256,address,address,bytes)", nonce, l2Sender, target, message)
+        );
 
         if (msg.sender == address(gateway) && gateway.xSender() == l2Handler) {
             require(!failedMessages[messageId]);

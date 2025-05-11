@@ -3,18 +3,26 @@
 pragma solidity =0.8.25;
 
 interface IStableSwap {
-    event AddLiquidity(address indexed provider, uint256[2] token_amounts, uint256[2] fees, uint256 invariant, uint256 token_supply);
+    event AddLiquidity(
+        address indexed provider, uint256[2] token_amounts, uint256[2] fees, uint256 invariant, uint256 token_supply
+    );
     event CommitNewAdmin(uint256 indexed deadline, address indexed admin);
     event CommitNewFee(uint256 indexed deadline, uint256 fee, uint256 admin_fee);
     event NewAdmin(address indexed admin);
     event NewFee(uint256 fee, uint256 admin_fee);
     event RampA(uint256 old_A, uint256 new_A, uint256 initial_time, uint256 future_time);
     event RemoveLiquidity(address indexed provider, uint256[2] token_amounts, uint256[2] fees, uint256 token_supply);
-    event RemoveLiquidityImbalance(address indexed provider, uint256[2] token_amounts, uint256[2] fees, uint256 invariant, uint256 token_supply);
+    event RemoveLiquidityImbalance(
+        address indexed provider, uint256[2] token_amounts, uint256[2] fees, uint256 invariant, uint256 token_supply
+    );
     event RemoveLiquidityOne(address indexed provider, uint256 token_amount, uint256 coin_amount);
     event StopRampA(uint256 A, uint256 t);
-    event TokenExchange(address indexed buyer, int128 sold_id, uint256 tokens_sold, int128 bought_id, uint256 tokens_bought);
-    event TokenExchangeUnderlying(address indexed buyer, int128 sold_id, uint256 tokens_sold, int128 bought_id, uint256 tokens_bought);
+    event TokenExchange(
+        address indexed buyer, int128 sold_id, uint256 tokens_sold, int128 bought_id, uint256 tokens_bought
+    );
+    event TokenExchangeUnderlying(
+        address indexed buyer, int128 sold_id, uint256 tokens_sold, int128 bought_id, uint256 tokens_bought
+    );
 
     function A() external view returns (uint256);
     function A_precise() external view returns (uint256);
@@ -55,8 +63,15 @@ interface IStableSwap {
     function owner() external view returns (address);
     function ramp_A(uint256 _future_A, uint256 _future_time) external;
     function remove_liquidity(uint256 _amount, uint256[2] memory _min_amounts) external returns (uint256[2] memory);
-    function remove_liquidity_imbalance(uint256[2] memory _amounts, uint256 _max_burn_amount) external returns (uint256);
-    function remove_liquidity_one_coin(uint256 _token_amount, int128 i, uint256 _min_amount) external returns (uint256);
+    function remove_liquidity_imbalance(
+        uint256[2] memory _amounts,
+        uint256 _max_burn_amount
+    ) external returns (uint256);
+    function remove_liquidity_one_coin(
+        uint256 _token_amount,
+        int128 i,
+        uint256 _min_amount
+    ) external returns (uint256);
     function revert_new_parameters() external;
     function revert_transfer_ownership() external;
     function stop_ramp_A() external;

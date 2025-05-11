@@ -99,7 +99,7 @@ contract UnstoppableChallenge is Test {
      */
     function _isSolved() private {
         // Flashloan check must fail
-        vm.prank(deployer); 
+        vm.prank(deployer);
         vm.expectEmit();
         emit UnstoppableMonitor.FlashLoanStatus(false);
         monitorContract.checkFlashLoan(100e18);

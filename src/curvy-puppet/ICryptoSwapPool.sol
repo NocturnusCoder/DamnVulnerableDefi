@@ -10,22 +10,55 @@ interface ICryptoSwapPool {
     event AddLiquidity(address indexed provider, uint256[2] token_amounts, uint256 fee, uint256 token_supply);
     event ClaimAdminFee(address indexed admin, uint256 tokens);
     event CommitNewParameters(
-        uint256 indexed deadline, uint256 admin_fee, uint256 mid_fee, uint256 out_fee, uint256 fee_gamma, uint256 allowed_extra_profit, uint256 adjustment_step, uint256 ma_half_time
+        uint256 indexed deadline,
+        uint256 admin_fee,
+        uint256 mid_fee,
+        uint256 out_fee,
+        uint256 fee_gamma,
+        uint256 allowed_extra_profit,
+        uint256 adjustment_step,
+        uint256 ma_half_time
     );
-    event NewParameters(uint256 admin_fee, uint256 mid_fee, uint256 out_fee, uint256 fee_gamma, uint256 allowed_extra_profit, uint256 adjustment_step, uint256 ma_half_time);
-    event RampAgamma(uint256 initial_A, uint256 future_A, uint256 initial_gamma, uint256 future_gamma, uint256 initial_time, uint256 future_time);
+    event NewParameters(
+        uint256 admin_fee,
+        uint256 mid_fee,
+        uint256 out_fee,
+        uint256 fee_gamma,
+        uint256 allowed_extra_profit,
+        uint256 adjustment_step,
+        uint256 ma_half_time
+    );
+    event RampAgamma(
+        uint256 initial_A,
+        uint256 future_A,
+        uint256 initial_gamma,
+        uint256 future_gamma,
+        uint256 initial_time,
+        uint256 future_time
+    );
     event RemoveLiquidity(address indexed provider, uint256[2] token_amounts, uint256 token_supply);
     event RemoveLiquidityOne(address indexed provider, uint256 token_amount, uint256 coin_index, uint256 coin_amount);
     event StopRampA(uint256 current_A, uint256 current_gamma, uint256 time);
-    event TokenExchange(address indexed buyer, uint256 sold_id, uint256 tokens_sold, uint256 bought_id, uint256 tokens_bought);
+    event TokenExchange(
+        address indexed buyer, uint256 sold_id, uint256 tokens_sold, uint256 bought_id, uint256 tokens_bought
+    );
 
     fallback() external payable;
 
     function A() external view returns (uint256);
     function D() external view returns (uint256);
     function add_liquidity(uint256[2] memory amounts, uint256 min_mint_amount) external payable returns (uint256);
-    function add_liquidity(uint256[2] memory amounts, uint256 min_mint_amount, bool use_eth) external payable returns (uint256);
-    function add_liquidity(uint256[2] memory amounts, uint256 min_mint_amount, bool use_eth, address receiver) external payable returns (uint256);
+    function add_liquidity(
+        uint256[2] memory amounts,
+        uint256 min_mint_amount,
+        bool use_eth
+    ) external payable returns (uint256);
+    function add_liquidity(
+        uint256[2] memory amounts,
+        uint256 min_mint_amount,
+        bool use_eth,
+        address receiver
+    ) external payable returns (uint256);
     function adjustment_step() external view returns (uint256);
     function admin_actions_deadline() external view returns (uint256);
     function admin_fee() external view returns (uint256);
@@ -52,11 +85,39 @@ interface ICryptoSwapPool {
         uint256 _new_ma_half_time
     ) external;
     function exchange(uint256 i, uint256 j, uint256 dx, uint256 min_dy) external payable returns (uint256);
-    function exchange(uint256 i, uint256 j, uint256 dx, uint256 min_dy, bool use_eth) external payable returns (uint256);
-    function exchange(uint256 i, uint256 j, uint256 dx, uint256 min_dy, bool use_eth, address receiver) external payable returns (uint256);
-    function exchange_extended(uint256 i, uint256 j, uint256 dx, uint256 min_dy, bool use_eth, address sender, address receiver, bytes32 cb) external payable returns (uint256);
+    function exchange(
+        uint256 i,
+        uint256 j,
+        uint256 dx,
+        uint256 min_dy,
+        bool use_eth
+    ) external payable returns (uint256);
+    function exchange(
+        uint256 i,
+        uint256 j,
+        uint256 dx,
+        uint256 min_dy,
+        bool use_eth,
+        address receiver
+    ) external payable returns (uint256);
+    function exchange_extended(
+        uint256 i,
+        uint256 j,
+        uint256 dx,
+        uint256 min_dy,
+        bool use_eth,
+        address sender,
+        address receiver,
+        bytes32 cb
+    ) external payable returns (uint256);
     function exchange_underlying(uint256 i, uint256 j, uint256 dx, uint256 min_dy) external payable returns (uint256);
-    function exchange_underlying(uint256 i, uint256 j, uint256 dx, uint256 min_dy, address receiver) external payable returns (uint256);
+    function exchange_underlying(
+        uint256 i,
+        uint256 j,
+        uint256 dx,
+        uint256 min_dy,
+        address receiver
+    ) external payable returns (uint256);
     function factory() external view returns (address);
     function fee() external view returns (uint256);
     function fee_gamma() external view returns (uint256);
@@ -100,10 +161,30 @@ interface ICryptoSwapPool {
     function ramp_A_gamma(uint256 future_A, uint256 future_gamma, uint256 future_time) external;
     function remove_liquidity(uint256 _amount, uint256[2] memory min_amounts) external;
     function remove_liquidity(uint256 _amount, uint256[2] memory min_amounts, bool use_eth) external;
-    function remove_liquidity(uint256 _amount, uint256[2] memory min_amounts, bool use_eth, address receiver) external;
-    function remove_liquidity_one_coin(uint256 token_amount, uint256 i, uint256 min_amount) external returns (uint256);
-    function remove_liquidity_one_coin(uint256 token_amount, uint256 i, uint256 min_amount, bool use_eth) external returns (uint256);
-    function remove_liquidity_one_coin(uint256 token_amount, uint256 i, uint256 min_amount, bool use_eth, address receiver) external returns (uint256);
+    function remove_liquidity(
+        uint256 _amount,
+        uint256[2] memory min_amounts,
+        bool use_eth,
+        address receiver
+    ) external;
+    function remove_liquidity_one_coin(
+        uint256 token_amount,
+        uint256 i,
+        uint256 min_amount
+    ) external returns (uint256);
+    function remove_liquidity_one_coin(
+        uint256 token_amount,
+        uint256 i,
+        uint256 min_amount,
+        bool use_eth
+    ) external returns (uint256);
+    function remove_liquidity_one_coin(
+        uint256 token_amount,
+        uint256 i,
+        uint256 min_amount,
+        bool use_eth,
+        address receiver
+    ) external returns (uint256);
     function revert_new_parameters() external;
     function stop_ramp_A_gamma() external;
     function token() external view returns (address);

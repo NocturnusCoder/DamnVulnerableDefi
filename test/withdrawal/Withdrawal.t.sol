@@ -103,9 +103,21 @@ contract WithdrawalChallenge is Test {
 
         // All withdrawals in the given set (including the suspicious one) must have been marked as processed and finalized in the L1 gateway
         assertGe(l1Gateway.counter(), WITHDRAWALS_AMOUNT, "Not enough finalized withdrawals");
-        assertTrue(l1Gateway.finalizedWithdrawals(hex"eaebef7f15fdaa66ecd4533eefea23a183ced29967ea67bc4219b0f1f8b0d3ba"), "First withdrawal not finalized");
-        assertTrue(l1Gateway.finalizedWithdrawals(hex"0b130175aeb6130c81839d7ad4f580cd18931caf177793cd3bab95b8cbb8de60"), "Second withdrawal not finalized");
-        assertTrue(l1Gateway.finalizedWithdrawals(hex"baee8dea6b24d327bc9fcd7ce867990427b9d6f48a92f4b331514ea688909015"), "Third withdrawal not finalized");
-        assertTrue(l1Gateway.finalizedWithdrawals(hex"9a8dbccb6171dc54bfcff6471f4194716688619305b6ededc54108ec35b39b09"), "Fourth withdrawal not finalized");
+        assertTrue(
+            l1Gateway.finalizedWithdrawals(hex"eaebef7f15fdaa66ecd4533eefea23a183ced29967ea67bc4219b0f1f8b0d3ba"),
+            "First withdrawal not finalized"
+        );
+        assertTrue(
+            l1Gateway.finalizedWithdrawals(hex"0b130175aeb6130c81839d7ad4f580cd18931caf177793cd3bab95b8cbb8de60"),
+            "Second withdrawal not finalized"
+        );
+        assertTrue(
+            l1Gateway.finalizedWithdrawals(hex"baee8dea6b24d327bc9fcd7ce867990427b9d6f48a92f4b331514ea688909015"),
+            "Third withdrawal not finalized"
+        );
+        assertTrue(
+            l1Gateway.finalizedWithdrawals(hex"9a8dbccb6171dc54bfcff6471f4194716688619305b6ededc54108ec35b39b09"),
+            "Fourth withdrawal not finalized"
+        );
     }
 }

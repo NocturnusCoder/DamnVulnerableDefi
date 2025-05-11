@@ -3,7 +3,13 @@
 pragma solidity =0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
-import {ShardsNFTMarketplace, IShardsNFTMarketplace, ShardsFeeVault, DamnValuableToken, DamnValuableNFT} from "../../src/shards/ShardsNFTMarketplace.sol";
+import {
+    ShardsNFTMarketplace,
+    IShardsNFTMarketplace,
+    ShardsFeeVault,
+    DamnValuableToken,
+    DamnValuableNFT
+} from "../../src/shards/ShardsNFTMarketplace.sol";
 import {DamnValuableStaking} from "../../src/DamnValuableStaking.sol";
 
 contract ShardsChallenge is Test {
@@ -57,7 +63,8 @@ contract ShardsChallenge is Test {
         token = new DamnValuableToken();
 
         // Deploy NFT marketplace and get the associated fee vault
-        marketplace = new ShardsNFTMarketplace(nft, token, address(new ShardsFeeVault()), oracle, MARKETPLACE_INITIAL_RATE);
+        marketplace =
+            new ShardsNFTMarketplace(nft, token, address(new ShardsFeeVault()), oracle, MARKETPLACE_INITIAL_RATE);
         feeVault = marketplace.feeVault();
 
         // Deploy DVT staking contract and enable staking of fees in marketplace

@@ -20,7 +20,10 @@ contract L2Handler {
     }
 
     function sendMessage(address target, bytes calldata message) external {
-        l2MessageStore.store({target: address(l1Forwarder), data: abi.encodeCall(L1Forwarder.forwardMessage, (nonce, msg.sender, target, message))});
+        l2MessageStore.store({
+            target: address(l1Forwarder),
+            data: abi.encodeCall(L1Forwarder.forwardMessage, (nonce, msg.sender, target, message))
+        });
 
         unchecked {
             nonce++;

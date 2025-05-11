@@ -7,7 +7,9 @@ contract Attack {
     DamnValuableToken public immutable token;
     address public immutable player;
 
-    constructor(DamnValuableToken _token) {
+    constructor(
+        DamnValuableToken _token
+    ) {
         token = _token;
         player = msg.sender;
     }

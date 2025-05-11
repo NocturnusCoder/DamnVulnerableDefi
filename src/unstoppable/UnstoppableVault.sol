@@ -31,7 +31,11 @@ contract UnstoppableVault is IERC3156FlashLender, ReentrancyGuard, Owned, ERC462
 
     event FeeRecipientUpdated(address indexed newFeeRecipient);
 
-    constructor(ERC20 _token, address _owner, address _feeRecipient) ERC4626(_token, "Too Damn Valuable Token", "tDVT") Owned(_owner) {
+    constructor(
+        ERC20 _token,
+        address _owner,
+        address _feeRecipient
+    ) ERC4626(_token, "Too Damn Valuable Token", "tDVT") Owned(_owner) {
         feeRecipient = _feeRecipient;
         emit FeeRecipientUpdated(_feeRecipient);
     }
@@ -74,7 +78,12 @@ contract UnstoppableVault is IERC3156FlashLender, ReentrancyGuard, Owned, ERC462
     /**
      * @inheritdoc IERC3156FlashLender
      */
-    function flashLoan(IERC3156FlashBorrower receiver, address _token, uint256 amount, bytes calldata data) external returns (bool) {
+    function flashLoan(
+        IERC3156FlashBorrower receiver,
+        address _token,
+        uint256 amount,
+        bytes calldata data
+    ) external returns (bool) {
         if (amount == 0) revert InvalidAmount(0); // fail early
         if (address(asset) != _token) revert UnsupportedCurrency(); // enforce ERC3156 requirement
         uint256 balanceBefore = totalAssets();
@@ -85,7 +94,10 @@ contract UnstoppableVault is IERC3156FlashLender, ReentrancyGuard, Owned, ERC462
 
         // callback must return magic value, otherwise assume it failed
         uint256 fee = flashFee(_token, amount);
-        if (receiver.onFlashLoan(msg.sender, address(asset), amount, fee, data) != keccak256("IERC3156FlashBorrower.onFlashLoan")) {
+        if (
+            receiver.onFlashLoan(msg.sender, address(asset), amount, fee, data)
+                != keccak256("IERC3156FlashBorrower.onFlashLoan")
+        ) {
             revert CallbackFailed();
         }
 

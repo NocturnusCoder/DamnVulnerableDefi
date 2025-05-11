@@ -4,6 +4,7 @@ pragma solidity =0.8.25;
 
 import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 import {WETH, NaiveReceiverPool} from "./NaiveReceiverPool.sol";
+import {WETH} from "solmate/tokens/WETH.sol";
 
 contract FlashLoanReceiver is IERC3156FlashBorrower {
     address private pool;
@@ -14,7 +15,13 @@ contract FlashLoanReceiver is IERC3156FlashBorrower {
         pool = _pool;
     }
 
-    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata) external returns (bytes32) {
+    function onFlashLoan(
+        address,
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    ) external returns (bytes32) {
         assembly {
             // gas savings
             if iszero(eq(sload(pool.slot), caller())) {

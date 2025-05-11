@@ -62,7 +62,8 @@ contract PuppetV2Pool {
     function _getOracleQuote(
         uint256 amount
     ) private view returns (uint256) {
-        (uint256 reservesWETH, uint256 reservesToken) = UniswapV2Library.getReserves({factory: _uniswapFactory, tokenA: address(_weth), tokenB: address(_token)});
+        (uint256 reservesWETH, uint256 reservesToken) =
+            UniswapV2Library.getReserves({factory: _uniswapFactory, tokenA: address(_weth), tokenB: address(_token)});
 
         return UniswapV2Library.quote({amountA: amount * 10 ** 18, reserveA: reservesToken, reserveB: reservesWETH});
     }

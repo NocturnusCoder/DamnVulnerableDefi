@@ -64,7 +64,12 @@ interface INonfungiblePositionManager {
     function collect(
         CollectParams memory params
     ) external payable returns (uint256 amount0, uint256 amount1);
-    function createAndInitializePoolIfNecessary(address token0, address token1, uint24 fee, uint160 sqrtPriceX96) external payable returns (address pool);
+    function createAndInitializePoolIfNecessary(
+        address token0,
+        address token1,
+        uint24 fee,
+        uint160 sqrtPriceX96
+    ) external payable returns (address pool);
     function decreaseLiquidity(
         DecreaseLiquidityParams memory params
     ) external payable returns (uint256 amount0, uint256 amount1);
@@ -86,7 +91,14 @@ interface INonfungiblePositionManager {
     function ownerOf(
         uint256 tokenId
     ) external view returns (address);
-    function permit(address spender, uint256 tokenId, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external payable;
+    function permit(
+        address spender,
+        uint256 tokenId,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external payable;
     function positions(
         uint256 tokenId
     )
@@ -109,10 +121,38 @@ interface INonfungiblePositionManager {
     function refundETH() external payable;
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) external;
-    function selfPermit(address token, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external payable;
-    function selfPermitAllowed(address token, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external payable;
-    function selfPermitAllowedIfNecessary(address token, uint256 nonce, uint256 expiry, uint8 v, bytes32 r, bytes32 s) external payable;
-    function selfPermitIfNecessary(address token, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external payable;
+    function selfPermit(
+        address token,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external payable;
+    function selfPermitAllowed(
+        address token,
+        uint256 nonce,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external payable;
+    function selfPermitAllowedIfNecessary(
+        address token,
+        uint256 nonce,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external payable;
+    function selfPermitIfNecessary(
+        address token,
+        uint256 value,
+        uint256 deadline,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) external payable;
     function setApprovalForAll(address operator, bool approved) external;
     function supportsInterface(
         bytes4 interfaceId

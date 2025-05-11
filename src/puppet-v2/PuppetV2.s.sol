@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Script} from "forge-std/Script.sol";
-import {Test,console} from "forge-std/Test.sol";
+import {Test, console} from "forge-std/Test.sol";
 import {IUniswapV2Pair} from "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import {IUniswapV2Factory} from "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import {IUniswapV2Router02} from "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
@@ -34,7 +34,7 @@ contract PuppetV2Challenge is Script, Test {
     function run() public {
         vm.startBroadcast(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80);
         // Use the standard .call method to send ETH to the player address.
-        (bool success, ) = player.call{value: PLAYER_INITIAL_ETH_BALANCE}("");
+        (bool success,) = player.call{value: PLAYER_INITIAL_ETH_BALANCE}("");
         // Ensure the ETH transfer was successful. If not, the script will revert here.
         require(success, "Failed to send ETH to player address");
 
@@ -43,8 +43,15 @@ contract PuppetV2Challenge is Script, Test {
         weth = new WETH();
 
         // Deploy Uniswap V2 Factory and Router
-        uniswapV2Factory = IUniswapV2Factory(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Factory.json"), abi.encode(address(0))));
-        uniswapV2Router = IUniswapV2Router02(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Router02.json"), abi.encode(address(uniswapV2Factory), address(weth))));
+        uniswapV2Factory = IUniswapV2Factory(
+            deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Factory.json"), abi.encode(address(0)))
+        );
+        uniswapV2Router = IUniswapV2Router02(
+            deployCode(
+                string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV2Router02.json"),
+                abi.encode(address(uniswapV2Factory), address(weth))
+            )
+        );
         console.log("uniswapV2Factory:", address(uniswapV2Factory));
         console.log("Uniswap V2 Router:", address(uniswapV2Router));
 
@@ -62,9 +69,10 @@ contract PuppetV2Challenge is Script, Test {
         console.log("Uniswap uniswapV2Exchange:", address(uniswapV2Exchange));
 
         // Deploy the lending pool
-        lendingPool = new PuppetV2Pool(address(weth), address(token), address(uniswapV2Exchange), address(uniswapV2Factory));
+        lendingPool =
+            new PuppetV2Pool(address(weth), address(token), address(uniswapV2Exchange), address(uniswapV2Factory));
         console.log("lendingPool:", address(lendingPool));
-        
+
         // Setup initial token balances of pool and player accounts
         token.transfer(player, PLAYER_INITIAL_TOKEN_BALANCE);
         token.transfer(address(lendingPool), POOL_INITIAL_TOKEN_BALANCE);

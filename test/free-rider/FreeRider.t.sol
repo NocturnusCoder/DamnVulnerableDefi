@@ -60,7 +60,9 @@ contract FreeRiderChallenge is Test {
 
         // Deploy Uniswap V2 Factory and Router
         uniswapV2Factory = IUniswapV2Factory(deployCode("builds/uniswap/UniswapV2Factory.json", abi.encode(address(0))));
-        uniswapV2Router = IUniswapV2Router02(deployCode("builds/uniswap/UniswapV2Router02.json", abi.encode(address(uniswapV2Factory), address(weth))));
+        uniswapV2Router = IUniswapV2Router02(
+            deployCode("builds/uniswap/UniswapV2Router02.json", abi.encode(address(uniswapV2Factory), address(weth)))
+        );
 
         token.approve(address(uniswapV2Router), UNISWAP_INITIAL_TOKEN_RESERVE);
         uniswapV2Router.addLiquidityETH{value: UNISWAP_INITIAL_WETH_RESERVE}(
@@ -93,7 +95,8 @@ contract FreeRiderChallenge is Test {
         marketplace.offerMany(ids, prices);
 
         // Deploy recovery manager contract, adding the player as the beneficiary
-        recoveryManager = new FreeRiderRecoveryManager{value: BOUNTY}(player, address(nft), recoveryManagerOwner, BOUNTY);
+        recoveryManager =
+            new FreeRiderRecoveryManager{value: BOUNTY}(player, address(nft), recoveryManagerOwner, BOUNTY);
 
         vm.stopPrank();
     }
@@ -120,12 +123,12 @@ contract FreeRiderChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_freeRider() public checkSolvedByPlayer  {
+    function test_freeRider() public checkSolvedByPlayer {
         emit log_named_decimal_uint("initial marketplace.offersCount", marketplace.offersCount(), 0);
         emit log_named_decimal_uint("initial marketplace eth balance", address(marketplace).balance, 18);
         emit log_named_decimal_uint("initial player ETH balance", player.balance, 18);
         emit log_named_decimal_uint("initial recoveryManager ETH balance", address(recoveryManager).balance, 18);
-        
+
         Attacker attackerContract = new Attacker(player, weth, uniswapPair, token, marketplace, nft, recoveryManager);
         console.log();
         console.log("Attacker contract deployed successfully");

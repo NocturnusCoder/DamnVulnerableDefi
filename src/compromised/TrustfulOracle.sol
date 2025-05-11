@@ -37,7 +37,11 @@ contract TrustfulOracle is AccessControlEnumerable {
     }
 
     // A handy utility allowing the deployer to setup initial prices (only once)
-    function setupInitialPrices(address[] calldata sources, string[] calldata symbols, uint256[] calldata prices) external onlyRole(INITIALIZER_ROLE) {
+    function setupInitialPrices(
+        address[] calldata sources,
+        string[] calldata symbols,
+        uint256[] calldata prices
+    ) external onlyRole(INITIALIZER_ROLE) {
         // Only allow one (symbol, price) per source
         require(sources.length == symbols.length && symbols.length == prices.length);
         for (uint256 i = 0; i < sources.length;) {

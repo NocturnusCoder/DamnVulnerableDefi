@@ -6,7 +6,11 @@ import {TransparentProxy} from "./TransparentProxy.sol";
 import {AuthorizerUpgradeable} from "./AuthorizerUpgradeable.sol";
 
 contract AuthorizerFactory {
-    function deployWithProxy(address[] memory wards, address[] memory aims, address upgrader) external returns (address authorizer) {
+    function deployWithProxy(
+        address[] memory wards,
+        address[] memory aims,
+        address upgrader
+    ) external returns (address authorizer) {
         authorizer = address(
             new TransparentProxy( // proxy
                 address(new AuthorizerUpgradeable()), // implementation
