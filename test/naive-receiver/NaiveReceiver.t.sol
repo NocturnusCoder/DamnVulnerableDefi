@@ -129,11 +129,7 @@ contract NaiveReceiverChallenge is Test {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(playerPk, requestHash);
         bytes memory signature = abi.encodePacked(r, s, v);
 
-        bytes memory executeCallData = abi.encodeWithSelector(
-        forwarder.execute.selector,
-        request,
-        signature
-        );
+        bytes memory executeCallData = abi.encodeWithSelector(forwarder.execute.selector, request, signature);
         emit log_named_bytes("execute call data", executeCallData);
         forwarder.execute(request, signature);
         vm.stopPrank();
